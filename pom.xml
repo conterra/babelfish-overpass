@@ -22,6 +22,7 @@
 		<commonsio.version>2.4</commonsio.version>
 		<jodatime.version>2.7</jodatime.version>
 		<osmosis.version>0.43.1</osmosis.version>
+		<plugin.license.version>1.8</plugin.license.version>
 		<plugin.findbugs.version>3.0.1</plugin.findbugs.version>
 	</properties>
 
@@ -93,6 +94,28 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>${plugin.license.version}</version>
+					<configuration>
+						<inceptionYear>${project.inceptionYear}</inceptionYear>
+						<organizationName>${project.organization.name}</organizationName>
+						<projectName>${project.name}</projectName>
+						<force>true</force>
+						<licenseFile>${basedir}/LICENSE</licenseFile>
+						<licenseName>apache_v2</licenseName>
+					</configuration>
+					<executions>
+						<execution>
+							<id>update-project-license</id>
+							<goals>
+								<goal>update-project-license</goal>
+							</goals>
+							<phase>generate-resources</phase>
+						</execution>
+					</executions>
+				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>jaxb2-maven-plugin</artifactId>
@@ -220,6 +243,10 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jaxb2-maven-plugin</artifactId>
