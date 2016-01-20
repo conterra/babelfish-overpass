@@ -1,0 +1,17 @@
+<services xmlns="http://conterra.de/Babelfish/Overpass">
+	<service id="amenity"
+		desc="Some public facilities from the OpenStreetMap database">
+		<nodeLayer name="benches" id="0">
+			<metaFilter>"amenity"="bench"</metaFilter>
+			<symbol>
+				<path>bench.png</path>
+			</symbol>
+		</nodeLayer>
+		<nodeLayer name="toilets" id="1" desc="public toilets">
+			<metaFilter>"amenity"="toilets"</metaFilter>
+			<symbol>
+				<path>toilet.png</path>
+			</symbol>
+		</nodeLayer>
+	</service>
+</services>

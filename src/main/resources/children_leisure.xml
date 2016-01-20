@@ -1,0 +1,10 @@
+<services xmlns="http://conterra.de/Babelfish/Overpass">
+	<service id="children_leisure" desc="leisure places for children from the OpenStreetMap database">
+		<polygonLayer name="playground" id="0">
+			<metaFilter>"amenity"="playground"</metaFilter>
+		</polygonLayer>
+		<polygonLayer name="zoo" id="1">
+			<metaFilter>"tourism"="zoo"</metaFilter>
+		</polygonLayer>
+	</service>
+</services>

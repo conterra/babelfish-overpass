@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://conterra.de/Babelfish/Overpass"
+	elementFormDefault="qualified" xmlns="http://conterra.de/Babelfish/Overpass">
+
+	<xsd:simpleType name="Color">
+		<xsd:annotation>
+			<xsd:documentation>a HTML color (e.g. #22FF88)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="xsd:NMTOKEN">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:token">
+					<xsd:pattern value="#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:union>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="lineStyleType">
+		<xsd:annotation>
+			<xsd:documentation>the style to render a polyline</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Null"></xsd:enumeration>
+			<xsd:enumeration value="Dot"></xsd:enumeration>
+			<xsd:enumeration value="DashDotDot"></xsd:enumeration>
+			<xsd:enumeration value="Dash"></xsd:enumeration>
+			<xsd:enumeration value="Solid"></xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="symbolType" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>a signature definition to render features</xsd:documentation>
+		</xsd:annotation>
+	</xsd:complexType>
+
+	<xsd:complexType name="pictureSymbolType">
+		<xsd:annotation>
+			<xsd:documentation>a symbol of a point</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="symbolType">
+				<xsd:sequence>
+					<xsd:choice maxOccurs="1" minOccurs="1">
+						<xsd:element name="data" type="xsd:string">
+							<xsd:annotation>
+								<xsd:documentation>the image data encoded with base64</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="path" type="xsd:string">
+							<xsd:annotation>
+								<xsd:documentation>the path to an image file (relative to theOverpass plugin directory)</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:choice>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="lineSymbolType">
+		<xsd:annotation>
+			<xsd:documentation>a line signature</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="symbolType">
+				<xsd:attribute name="style" type="lineStyleType" use="optional"
+					default="Solid">
+					<xsd:annotation>
+						<xsd:documentation>the style of the line</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="width" type="xsd:int" use="optional"
+					default="1">
+					<xsd:annotation>
+						<xsd:documentation>the with to render the line</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="color" type="Color" use="optional"
+					default="#00DDFF">
+					<xsd:annotation>
+						<xsd:documentation>the color of the line</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="fillSymbolType">
+		<xsd:annotation>
+			<xsd:documentation>a symbol to fill polygons</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="symbolType">
+				<xsd:sequence>
+					<xsd:element name="outline" type="lineSymbolType"
+						maxOccurs="1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>the signature, how to render the outline of the polygon</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="color" type="Color" default="#FFD700"
+					use="optional">
+					<xsd:annotation>
+						<xsd:documentation>the color to fill the polygon with</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="layerType" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>a layer to provide OpenStreetMap features on a Babelfish server</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice maxOccurs="1" minOccurs="1">
+			<xsd:element name="metaFilter" type="xsd:string"
+				maxOccurs="unbounded" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>filter of the OpenStreetMap tags</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="script" type="xsd:string" maxOccurs="1"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>a complete Overpass script to filter the data. Must contain one or more {{bbox}} as placeholder of the requested bounding box.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:choice>
+		<xsd:attribute name="id" type="xsd:int" use="required">
+			<xsd:annotation>
+				<xsd:documentation>the uniqe identifier</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="name" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation>a user-friendly name</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="desc" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>a layer description</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="nodeLayerType">
+		<xsd:annotation>
+			<xsd:documentation>a layer, which shows OpenStreetMap nodes as points</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="layerType">
+				<xsd:sequence>
+					<xsd:element name="symbol" type="pictureSymbolType"
+						maxOccurs="1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>a signature to render the points</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="lineLayerType">
+		<xsd:annotation>
+			<xsd:documentation>a layer, which shows OpenStreetMap ways as polylines</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="layerType">
+				<xsd:sequence>
+					<xsd:element name="symbol" type="lineSymbolType"
+						maxOccurs="1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>a signature, how to render the lines</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="polygonLayerType">
+		<xsd:annotation>
+			<xsd:documentation>a layer, which shows OpenStreetMap ways as polygons</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="layerType">
+				<xsd:sequence>
+					<xsd:element name="symbol" type="fillSymbolType"
+						maxOccurs="1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>a signature to render the polygons</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="serviceType">
+		<xsd:annotation>
+			<xsd:documentation>a features service to add to the Babelfish server</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence maxOccurs="unbounded" minOccurs="1">
+			<xsd:element name="nodeLayer" type="nodeLayerType"></xsd:element>
+			<xsd:element name="lineLayer" type="lineLayerType"></xsd:element>
+			<xsd:element name="polygonLayer" type="polygonLayerType"></xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation>the unique identifier</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="desc" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>a service description</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:element name="services">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="service" type="serviceType"
+					maxOccurs="unbounded" minOccurs="1"></xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

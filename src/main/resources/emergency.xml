@@ -1,0 +1,10 @@
+<services xmlns="http://conterra.de/Babelfish/Overpass">
+	<service id="emergency" desc="Emergency points from the OpenStreetMap database">
+		<nodeLayer name="emergency" id="0">
+			<script>(node["highway"="emergency_access_point"]({{bbox}});node["emergency"="defibrillator"]({{bbox}}););(._;>;);</script>
+			<symbol>
+				<path>emergency.png</path>
+			</symbol>
+		</nodeLayer>
+	</service>
+</services>

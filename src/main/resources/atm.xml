@@ -1,0 +1,39 @@
+<services xmlns="http://conterra.de/Babelfish/Overpass">
+	<service id="atm" desc="ATMs from the OpenStreetMap database">
+		<nodeLayer name="Sparkasse" id="0">
+			<metaFilter>"amenity"="atm"</metaFilter>
+			<metaFilter>"operator"~"Sparkasse"</metaFilter>
+			<symbol>
+				<data>iVBORw0KGgoAAAANSUhEUgAAABsAAAAgCAYAAADjaQM7AAABUUlEQVR42mNgIAAeMUjBaGYgdgPii0D8B4ifA3E7ELMwUBMADWQF4igg/o8FH4Q5iFqWiQLxZxyWfQTiKmpZxATErjgsguG91LIMFFcBBCw7Ts1gVMVj0U8gnkcNS2A0DxAvxmHZEyDWo5avYDQ/EG9Ds+glKDsgq6OahVC2JhAnALE7KD7JtgioyRGIU4E4jUKcDsSxQKyO4WAgIwyIfxFIceTi40BsArPImUaWIOO7oGBngNr8nw54GwM0n9DDsscMdLIIhN/S3bJ/WCT+AvElIG4C4lYq4DYgrsFlGahynMNAbQD1BT2C8Q0D1Bd0izO6WvZ72Fr2FVoIUwv/wWkZDVJ3Lj6fLQDipVTAS4B4BRCfx2fZF3rHGd0se0Iny66ALJtGB4tA5e8kWBPtIY0tA3U+xMGtHmgvpRnkVSD+BI1HSjEo4d0C4kpQIxeULQA1hcWO+jhyDQAAAABJRU5ErkJggg==</data>
+			</symbol>
+		</nodeLayer>
+		<nodeLayer name="Volksbank" id="1">
+			<metaFilter>"amenity"="atm"</metaFilter>
+			<metaFilter>"operator"~"Volksbank"</metaFilter>
+			<symbol>
+				<data>iVBORw0KGgoAAAANSUhEUgAAACAAAAAVCAYAAAAnzezqAAADY0lEQVR42mOQDpj8X9ir/7+IN/2xqM+E/wxCnv3/OZ06gbiL7pjbpfs/A8j3nM5d/7kGAPPgcwAnHkyKJfj0YHUAiC3o0XtT2KvvmJAnJgaKH+J16/6IzUBQkPK793wF6r/G59ZzXMgLrueIgHvvbW6Xrr9EOUDUu79LNnCyhKT/RCF0rBc3gxWoZy5Q7R9kw3hde16L+03MAKqREvXpFxHy7BWSAOnxmyhknjqfG+iYBpADiYoCoKt3SPhN5GfAAaT8J8ZxO3d9R/L5H6CeRlzqrTIX8gBDZS7RaYDfvfejuO8EMXSD5IOngGnjpHlKwOD8BDfItfuuYuhUE7CkSjlcPYdTJ5iW9J+kDDTzGNEOABr+Hxh8icC8ai/iPcFezHeChWrEdF5kx/C79TyCB79bz9H///8zwuSUQqdpKoVNlYfxRbz7rIFp4iMpueAf0FBQggKFxn9Bz74fwDThBzIstHYd1ND+ZVDH/gUmsrlgQcFsMAU087BM4OQqmAOAaSIW5CmSsiFa6v4JtLAOZJhb4XJIOgiYlAJ1wBcJvwmpyKEDjJJXCiFTPUBsp9xlLMBEPZnTmRIHADEwG61AtsQue7ECJ8QBbzSiZ+rBxLViZmoD1b8TAeYU2aApFsDEnAbKIVyUOAAaz0f04mdLITtC0KPvDVD8MbKYpN+kSGCIfQDq+Q3EX4D4B1klIYYDXLvvAfO0HciSyhn7oXHdtxKYPraC2PEtm2AJrg0YKj+JLoqFQA5wIkKxa/cvoIUocS0dMCkVmF2rUEOldxM3KXWBmO+k87xuvQQxn3vvdRGfiVnIlhknz1VSCJ5iCeOvOvOelc+jbwGPW+9FID5HCAPVnmNwy5qtaZ86HYhn4MV2KdO1HbLmS5TdgOX3ADCZ0LqFBeaAqopO9tisDo2ojA5DYnBMZqchw7NU4R1P4rl2PEkgiHc/TuJf9jBdXBNkWcPM3fCQcMlfCqYfpYt7P0ni2/IkgXsfEO8liJN49zI8ShX9/yCeG4h5COKHifz/H6aK+oAsO40UFVc1IfTDFJGmBwl8RJkFxkC1JDkA7Ig08dI3c7NY0OsJYFHM9DBJcAHRlsMdkC75/0GiwP+HSYTxAyB+lC6x9HG+miC6Ax4XaUk+SBLcAjT4NxB/Iwon8H0DAF7XIjNIbVfWAAAAAElFTkSuQmCC</data>
+			</symbol>
+		</nodeLayer>
+		<nodeLayer name="Deutsche Bank" id="2">
+			<metaFilter>"amenity"="atm"</metaFilter>
+			<metaFilter>"operator"~"Deutsche Bank"</metaFilter>
+			<symbol>
+				<data>iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABBklEQVR42mNgkFjxF4j/DRD+wwBl/B8g/HfUAdgccB+Il9EIHyLGAcsYaAUkVgSOUAdIrKCDAyRWqOFIaE20DQGQ7yRWcOOw/A19QkBixQUcDhChfRqQWJGBw3J32iZCSNDjivfNKEFPdQdALAfhd1gs/43VchqEwAocvpekfTkgsSIKh+X1WH1ONQdAgl0Ah+VXaFsSIvLyDSyWf6dPUSyxYi4O3zvgDXoqhYAxDssX07YyQgT9VyyW36JPbSix4iYO33MTFfRkOwCS6utxWB5P+/aAxAp+HJavoH2DBOJ7FyD2Q8NBQMxOUtDTpC4Yzm3CQ1CFtMAdoz2jQemAP9Au+kDg3wC1SUNg525IfQAAAABJRU5ErkJggg==</data>
+			</symbol>
+		</nodeLayer>
+		<nodeLayer name="Postbank" id="3">
+			<metaFilter>"amenity"="atm"</metaFilter>
+			<metaFilter>"operator"~"Postbank"</metaFilter>
+			<symbol>
+				<data>iVBORw0KGgoAAAANSUhEUgAAACAAAAAVCAYAAAAnzezqAAAD30lEQVR42o2Wf0zUdRjHP987wHZwxwEHgkduxyE5YLQUsKkgoHRAnMJ2MhEsQDq6gJZb0xyi2VbBaLO2Ns0/dBMnpxUZlZu0JcguIvmRRj80h6u21virzdmK1LfP5/P9mnr3Pe7zx2v3x+37vN/P83me5/NhmFQgxZSCm2MxeH9PLirXVsH19LMoXrUZa3Jr8dQTHmQ76uBMr4d9aSOSE56DJa4ZUcYXsDy1AUf25uD2twaKwULiMlkDNz4zY1NhNRh7iWgLwhsCF3cXV+D62XjgexY2bkQDdy8ZcHnABod9OwV+EYriXRQunmBpQtfOQjXGDFs0PltcXMHMKRtSbTskxdvw+NIGHO3KBn5i4th0kTVwdTABGfZ6aXHeA6d7nKr4RYoxSoxoXCC+0vhawsCfwybRZIz5pMQdZNTfkwn8QOKHKUYdUUNUEeVEMVFENBIn+NEsYuDvQDRe2b6WArdLifMj+mAflX2WxLsphol+WRBGopI4S//PRqjAx30Z0pnHmVrQ7S1QO30/Ea0jbiU6mdqQ3KQ2jv9NGEMN/PaFGek0yzx4pG430qh5ystxh8/4exTUEkb8NYZ/pqIweSoZn7zjwOm3nUQmAsfSHjXAl0X71vXS2ec6t2L2o0RgkESylFBxfhQvMyxMGnHyrRViKTG2i+hAYU4tzvQ6HzUw2Z8Mg8ErJW6JbcahV/PoOxLx6IgbiFqGOwEDBnozkSZGuR0x0a2od23E3JBFTMv/Bm5PGFBdVCE1ctxkaYEbC+NG4F0SUnRKn8cbjmHsZBqyM+qEOP/Os7Ecv35uFtNy9+EmHD+eGvHc72efFP88Puyjeb9IImt0so8nDjD8MRaLbc9sEiXnia17sgZX/EnAj6r4gymg7bSlxCVlgGexYfVmgLYkDulkztlAAgEFxw6u1Ez7xBH0v5Gl7ongTXht0IpoOhuZ7K3mJhzuygECTF0wweJJxJsMvwxbtcurXXzX5C7Bv+NRIXeDMNC9s0B63a5Yvg1/jS4BBsLM/ComzPmp8dSb0icuMj5+YkUHX0Z89BzL6sVcR5p73sE7qsuA7yjQbp3sHyNaGObHTfB5irSz96G21CW2K6Z1DFzqT5FuvkRqvgG+70eYutuDDdiJI1TUMynaJdYpeuZ1bz7ws/61zA62rZY2YE9pxPwFEzBEwWJ0yp9JjDLM+G2ooFdTGY1qY1UZRo4uA66EMVCa745Y/vvw55c4x3P0sYuoJtwalUQHcVnBLSo3fwnNfRqP38/FqeWfCvMgsZqbpV45S2Ja0bKlRMwwvqGPzxNfPsSwdudPa4+OGfaAqfBvjnuaeoJXXrPFzwAAAABJRU5ErkJggg==</data>
+			</symbol>
+		</nodeLayer>
+		<nodeLayer name="Other operators" id="4">
+			<metaFilter>"amenity"="atm"</metaFilter>
+			<metaFilter>"operator"!~"Sparkasse"</metaFilter>
+			<metaFilter>"operator"!~"Volksbank"</metaFilter>
+			<metaFilter>"operator"!~"Deutsche Bank"</metaFilter>
+			<metaFilter>"operator"!~"Postbank"</metaFilter>
+		</nodeLayer>
+	</service>
+</services>
