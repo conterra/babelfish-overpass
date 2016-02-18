@@ -274,7 +274,7 @@
 	</reporting>
 
 	<scm>
-		<developerConnection>scm:svn:https://svn01.esri-de.com/svn/PRJ_sdi.suite/produkte/mapapps/incubator/babelfish/babelfish-overpass/trunk</developerConnection>
+		<developerConnection>scm:git:git@github.com:conterra/babelfish-overpass.git</developerConnection>
 	</scm>
 
 	<distributionManagement>
