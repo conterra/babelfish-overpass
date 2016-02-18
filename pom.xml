@@ -20,7 +20,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
-		<junit.version>4.12</junit.version>
 		<log4j.version>1.2.17</log4j.version>
 		<slf4j.version>1.7.16</slf4j.version>
 		<babelfish.version>0.3.0</babelfish.version>
@@ -28,6 +27,8 @@
 		<commonsio.version>2.4</commonsio.version>
 		<jodatime.version>2.9.2</jodatime.version>
 		<osmosis.version>0.44.1</osmosis.version>
+		<junit.version>4.12</junit.version>
+		<mockito.version>1.10.19</mockito.version>
 		<plugin.license.version>1.8</plugin.license.version>
 		<plugin.jaxb.version>2.2</plugin.jaxb.version>
 		<plugin.mavenproperties.version>1.0.0</plugin.mavenproperties.version>
@@ -40,12 +41,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -101,6 +96,18 @@
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-pbf</artifactId>
 			<version>${osmosis.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>${mockito.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
