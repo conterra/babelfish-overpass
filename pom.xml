@@ -10,27 +10,40 @@
 
 	<name>tRESTle Babelfish Overpass plugin</name>
 	<url>http://developernetwork.conterra.de</url>
+	<inceptionYear>2016</inceptionYear>
 	<description>A tRESTle Babelfish plugin, which uses the Overpass API to deploy filtered OpenStreetMap features</description>
+	<organization>
+		<name>con terra - Gesellschaft für Angewandte Informationstechnologie mbH</name>
+		<url>http://www.conterra.de</url>
+	</organization>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
+		<junit.version>4.12</junit.version>
 		<log4j.version>1.2.17</log4j.version>
-		<slf4j.version>1.7.12</slf4j.version>
+		<slf4j.version>1.7.16</slf4j.version>
 		<babelfish.version>0.3.0</babelfish.version>
 		<commonslang.version>3.4</commonslang.version>
 		<commonsio.version>2.4</commonsio.version>
-		<jodatime.version>2.7</jodatime.version>
-		<osmosis.version>0.43.1</osmosis.version>
+		<jodatime.version>2.9.2</jodatime.version>
+		<osmosis.version>0.44.1</osmosis.version>
 		<plugin.license.version>1.8</plugin.license.version>
-		<plugin.findbugs.version>3.0.1</plugin.findbugs.version>
+		<plugin.jaxb.version>2.2</plugin.jaxb.version>
+		<plugin.mavenproperties.version>1.0.0</plugin.mavenproperties.version>
+		<plugin.findbugs.version>3.0.3</plugin.findbugs.version>
+		<plugin.compiler.version>3.5.1</plugin.compiler.version>
+		<plugin.shade.version>2.4.3</plugin.shade.version>
+		<plugin.javadoc.version>2.10.3</plugin.javadoc.version>
+		<plugin.source.version>3.0.0</plugin.source.version>
+		<plugin.release.version>2.5.3</plugin.release.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -119,7 +132,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>jaxb2-maven-plugin</artifactId>
-					<version>1.6</version>
+					<version>${plugin.jaxb.version}</version>
 					<executions>
 						<execution>
 							<id>xjc-config</id>
@@ -182,7 +195,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.3</version>
+					<version>${plugin.compiler.version}</version>
 					<configuration>
 						<source>${java.version}</source>
 						<target>${java.version}</target>
@@ -191,7 +204,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>2.3</version>
+					<version>${plugin.shade.version}</version>
 					<executions>
 						<execution>
 							<phase>package</phase>
@@ -216,7 +229,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>2.10.2</version>
+					<version>${plugin.javadoc.version}</version>
 					<configuration>
 						<!-- <additionalparam>-Xdoclint:none</additionalparam> -->
 						<links>
@@ -230,11 +243,11 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>2.4</version>
+					<version>${plugin.source.version}</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.5.1</version>
+					<version>${plugin.release.version}</version>
 					<configuration>
 						<preparationGoals>clean</preparationGoals>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
