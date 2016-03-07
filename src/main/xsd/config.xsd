@@ -4,12 +4,14 @@
 	elementFormDefault="qualified" xmlns="http://conterra.de/Babelfish/Overpass">
 
 	<xsd:annotation>
-		<xsd:documentation>defines a configuration file of the Babelfish Overpass plugin</xsd:documentation>
+		<xsd:documentation>defines a configuration file of the Babelfish
+			Overpass plugin</xsd:documentation>
 	</xsd:annotation>
 
 	<xsd:simpleType name="HttpUrl">
 		<xsd:annotation>
-			<xsd:documentation>a xsd:string which could only contain a URL of HTTP</xsd:documentation>
+			<xsd:documentation>a xsd:string which could only contain an URL of
+				HTTP</xsd:documentation>
 		</xsd:annotation>
 		<xsd:union memberTypes="xsd:anyURI">
 			<xsd:simpleType>
@@ -30,13 +32,15 @@
 		<xsd:attribute name="retryDelay" type="xsd:int" use="optional"
 			default="1000">
 			<xsd:annotation>
-				<xsd:documentation>the time to wait before retry an Overpass request (in milliseconds)</xsd:documentation>
+				<xsd:documentation>the time to wait before retry an Overpass request
+					(in milliseconds)</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="requestTimeout" use="optional"
 			default="30">
 			<xsd:annotation>
-				<xsd:documentation>the timeout of a Overpass request (in seconds)</xsd:documentation>
+				<xsd:documentation>the timeout of an Overpass request (in seconds)
+				</xsd:documentation>
 			</xsd:annotation>
 			<xsd:simpleType>
 				<xsd:restriction base="xsd:int">

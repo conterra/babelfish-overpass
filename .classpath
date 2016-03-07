@@ -12,7 +12,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="target/generated-sources/jaxb">
+	<classpathentry kind="src" path="target/generated-sources/xjc">
 		<attributes>
 			<attribute name="ignore_optional_problems" value="true"/>
 		</attributes>

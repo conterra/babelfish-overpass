@@ -56,24 +56,24 @@ public class OverpassHandler
 	 * 
 	 * @since 0.0.1
 	 */
-	public static final Logger LOGGER = LoggerFactory.getLogger(OverpassHandler.class);
+	public static final Logger						LOGGER				= LoggerFactory.getLogger(OverpassHandler.class);
 	/**
 	 * the default {@link CoordinateReferenceSystem} of the OpenStreetMap
 	 * database
 	 * 
 	 * @since 0.0.1
 	 */
-	public static final CoordinateReferenceSystem OSM_CRS;
+	public static final CoordinateReferenceSystem	OSM_CRS;
 	/**
 	 * the placeholder of a bounding box
 	 * 
 	 * @since 0.1.0
 	 */
-	public static final String BBOX_PLACEHOLDER = "{{bbox}}";
-	
+	public static final String						BBOX_PLACEHOLDER	= "{{bbox}}";
+																		
 	static
 	{
-		CoordinateReferenceSystem crs = null;
+		CoordinateReferenceSystem crs;
 		
 		try
 		{
@@ -100,20 +100,22 @@ public class OverpassHandler
 	 * gives the {@link InputStream} to the requested OpenStreetMap data
 	 * 
 	 * @since 0.1.0
-	 * 
+	 * 		
 	 * @param script the Overpass API script the request on the server
 	 * @param bbox the bounding box
 	 * @return an {@link InputStream} to the requested data
 	 * @throws IllegalArgumentException if the script contains no placeholder of
-	 *         the bounding box
+	 *             the bounding box
 	 * @throws IOException if an error occurred on request the data from the
-	 *         Overpass API
+	 *             Overpass API
 	 */
 	private static InputStream request(String script, Envelope bbox)
 	throws IllegalArgumentException, IOException
 	{
 		if ( !script.contains(OverpassHandler.BBOX_PLACEHOLDER))
+		{
 			throw new IllegalArgumentException("The script must contain one or more \"{{bbox}}\"!");
+		}
 		
 		String timeoutStartTag = "[timeout:";
 		
@@ -121,16 +123,18 @@ public class OverpassHandler
 		int idxTimeoutEnd = idxTimeoutStart < 0 ? 0 : script.indexOf("]", idxTimeoutStart);
 		
 		if (idxTimeoutStart < 0)
+		{
 			idxTimeoutStart = 0;
+		}
 		
 		String timeoutEndTag = idxTimeoutEnd <= 0 ? "];" : "";
 		
-		script = script.substring(0, idxTimeoutStart)
-		+ timeoutStartTag + OverpassConfigStore.REQUEST_TIMEOUT + timeoutEndTag
-		+ script.substring(idxTimeoutEnd);
+		script = script.substring(0, idxTimeoutStart) + timeoutStartTag + OverpassConfigStore.REQUEST_TIMEOUT + timeoutEndTag + script.substring(idxTimeoutEnd);
 		
 		if ( !script.contains("out "))
+		{
 			script += "out meta;";
+		}
 		
 		if (bbox != null)
 		{
@@ -149,10 +153,7 @@ public class OverpassHandler
 				throw new IOException(msg, e);
 			}
 			
-			String bboxString = lowerCorner.getOrdinate(0) + ","
-			+ lowerCorner.getOrdinate(1) + ","
-			+ upperCorner.getOrdinate(0) + ","
-			+ upperCorner.getOrdinate(1);
+			String bboxString = lowerCorner.getOrdinate(0) + "," + lowerCorner.getOrdinate(1) + "," + upperCorner.getOrdinate(0) + "," + upperCorner.getOrdinate(1);
 			
 			script = script.replace(OverpassHandler.BBOX_PLACEHOLDER, bboxString);
 		}
@@ -199,7 +200,9 @@ public class OverpassHandler
 						
 						long stopTime = System.currentTimeMillis() + OverpassConfigStore.RETRY_DELAY;
 						while (System.currentTimeMillis() < stopTime)
+						{
 							;
+						}
 						
 						continue;
 					}
@@ -228,7 +231,7 @@ public class OverpassHandler
 	 * to
 	 * 
 	 * @since 0.0.1
-	 * 
+	 * 		
 	 * @param clazz the {@link Class} to get the {@link EntityType} of
 	 * @return the {@link EntityType} of the given {@link Class}
 	 */
@@ -257,9 +260,9 @@ public class OverpassHandler
 	 * {@link GeometryObject} {@link Class}
 	 * 
 	 * @since 0.0.1
-	 * 
+	 * 		
 	 * @param clazz the {@link GeometryObject} {@link Class} to get the
-	 *        {@link Entity} {@link Class} of
+	 *            {@link Entity} {@link Class} of
 	 * @return the {@link Entity} {@link Class} of the given
 	 *         {@link GeometryObject} {@link Class}
 	 */
@@ -271,9 +274,7 @@ public class OverpassHandler
 			
 			return Relation.class;
 		}
-		else if (Polygon.class.isAssignableFrom(clazz)
-		|| de.conterra.babelfish.plugin.v10_02.object.geometry.Envelope.class.isAssignableFrom(clazz)
-		|| Polyline.class.isAssignableFrom(clazz))
+		else if (Polygon.class.isAssignableFrom(clazz) || de.conterra.babelfish.plugin.v10_02.object.geometry.Envelope.class.isAssignableFrom(clazz) || Polyline.class.isAssignableFrom(clazz))
 		{
 			OverpassHandler.LOGGER.debug(clazz + " is a way.");
 			
@@ -290,7 +291,7 @@ public class OverpassHandler
 	 * {@link EntityType}
 	 * 
 	 * @since 0.0.1
-	 * 
+	 * 		
 	 * @param entityType the {@link EntityType} to get the representation of
 	 * @return the {@link GeometryObject} representation of
 	 *         <code>entityType</code>
@@ -312,13 +313,13 @@ public class OverpassHandler
 	 * gives a {@link Set} of all requested {@link Entity}s
 	 * 
 	 * @since 0.0.1
-	 * 
+	 * 		
 	 * @param script the Overpass API script to request on the server
 	 * @param bbox the bounding box
 	 * @return a {@link Set} of all delivered {@link Entity}s
 	 * @throws IllegalArgumentException if no script or bounding box was given
 	 * @throws IOException if an error occurred on request the data from the
-	 *         Overpass API
+	 *             Overpass API
 	 */
 	public static Map<? extends Long, ? extends Entity> getFeatures(String script, Envelope bbox)
 	throws IllegalArgumentException, IOException
@@ -357,7 +358,7 @@ public class OverpassHandler
 				}
 			};
 			
-			parser.parse(is, new OsmHandler(sink, false));
+			parser.parse(is, new OsmHandler(sink, true));
 			
 			OverpassHandler.LOGGER.debug("Received " + res.size() + " features.");
 			

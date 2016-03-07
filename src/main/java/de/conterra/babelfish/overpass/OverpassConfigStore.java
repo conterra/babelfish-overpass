@@ -29,27 +29,27 @@ public class OverpassConfigStore
 	 * 
 	 * @since 0.0.1
 	 */
-	public static final Logger LOGGER = LoggerFactory.getLogger(OverpassConfigStore.class);
-	
+	public static final Logger	LOGGER	= LoggerFactory.getLogger(OverpassConfigStore.class);
+										
 	/**
 	 * {@link URL} to the Overpass service
 	 * 
 	 * @since 0.1.0
 	 */
-	public static final String SERVICE_URL;
+	public static final String	SERVICE_URL;
 	/**
 	 * the time to wait before retry an Overpass request (in milliseconds)
 	 * 
 	 * @since 0.1.0
 	 */
-	public static final long RETRY_DELAY;
+	public static final long	RETRY_DELAY;
 	/**
 	 * the timeout of a Overpass request (in seconds)
 	 * 
 	 * @since 0.1.0
 	 */
-	public static final int REQUEST_TIMEOUT;
-	
+	public static final int		REQUEST_TIMEOUT;
+								
 	static
 	{
 		String serviceUrl = "http://overpass-api.de/api/";

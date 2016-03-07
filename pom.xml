@@ -38,7 +38,7 @@
 		<junit.version>4.12</junit.version>
 		<mockito.version>1.10.19</mockito.version>
 		<plugin.license.version>1.8</plugin.license.version>
-		<plugin.jaxb.version>2.2</plugin.jaxb.version>
+		<plugin.jaxb.version>0.12.1</plugin.jaxb.version>
 		<plugin.mavenproperties.version>1.0.0</plugin.mavenproperties.version>
 		<plugin.findbugs.version>3.0.3</plugin.findbugs.version>
 		<plugin.compiler.version>3.5.1</plugin.compiler.version>
@@ -123,46 +123,6 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>license-maven-plugin</artifactId>
-					<version>${plugin.license.version}</version>
-					<configuration>
-						<inceptionYear>${project.inceptionYear}</inceptionYear>
-						<organizationName>${project.organization.name}</organizationName>
-						<projectName>${project.name}</projectName>
-						<force>true</force>
-						<licenseFile>${basedir}/LICENSE</licenseFile>
-						<licenseName>apache_v2</licenseName>
-					</configuration>
-					<executions>
-						<execution>
-							<id>update-project-license</id>
-							<goals>
-								<goal>update-project-license</goal>
-							</goals>
-							<phase>generate-resources</phase>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>jaxb2-maven-plugin</artifactId>
-					<version>${plugin.jaxb.version}</version>
-					<executions>
-						<execution>
-							<id>xjc-config</id>
-							<goals>
-								<goal>xjc</goal>
-							</goals>
-							<configuration>
-								<schemaDirectory>${project.basedir}/src/main/xsd</schemaDirectory>
-								<schemaFiles>*.xsd</schemaFiles>
-								<packageName>de.conterra.babelfish.overpass.config</packageName>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
 					<!-- We use this plugin to ensure that our usage of the org.codehaus.mojo:jaxb2-maven-plugin 
 						is JDK 8 compatible -->
 					<groupId>org.codehaus.mojo</groupId>
@@ -185,6 +145,54 @@
 							</property>
 						</properties>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.jvnet.jaxb2.maven2</groupId>
+					<artifactId>maven-jaxb2-plugin</artifactId>
+					<version>${plugin.jaxb.version}</version>
+					<executions>
+						<execution>
+							<id>generate-config</id>
+							<goals>
+								<goal>generate</goal>
+							</goals>
+							<configuration>
+								<schemas>
+									<schema>
+										<fileset>
+											<directory>${project.basedir}/src/main/xsd</directory>
+											<includes>
+												<include>*.xsd</include>
+											</includes>
+										</fileset>
+									</schema>
+								</schemas>
+								<generatePackage>de.conterra.babelfish.overpass.config</generatePackage>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>${plugin.license.version}</version>
+					<configuration>
+						<inceptionYear>${project.inceptionYear}</inceptionYear>
+						<organizationName>${project.organization.name}</organizationName>
+						<projectName>${project.name}</projectName>
+						<force>true</force>
+						<licenseFile>${basedir}/LICENSE</licenseFile>
+						<licenseName>apache_v2</licenseName>
+					</configuration>
+					<executions>
+						<execution>
+							<id>update-project-license</id>
+							<goals>
+								<goal>update-project-license</goal>
+							</goals>
+							<phase>generate-resources</phase>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
@@ -272,12 +280,12 @@
 		</pluginManagement>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxb2-maven-plugin</artifactId>
+				<artifactId>license-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -303,6 +311,7 @@
 
 	<scm>
 		<developerConnection>scm:git:git@github.com:conterra/babelfish-overpass.git</developerConnection>
+		<url>https://github.com/conterra/babelfish-overpass</url>
 	</scm>
 
 	<distributionManagement>
