@@ -310,7 +310,7 @@
 	</reporting>
 
 	<scm>
-		<developerConnection>scm:git:git@github.com:conterra/babelfish-overpass.git</developerConnection>
+		<developerConnection>scm:git:https://github.com/conterra/babelfish-overpass.git</developerConnection>
 		<url>https://github.com/conterra/babelfish-overpass</url>
 	</scm>
 
