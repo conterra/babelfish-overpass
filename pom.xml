@@ -157,10 +157,6 @@
 					<artifactId>license-maven-plugin</artifactId>
 					<version>${plugin.license.version}</version>
 					<configuration>
-						<inceptionYear>${project.inceptionYear}</inceptionYear>
-						<organizationName>${project.organization.name}</organizationName>
-						<projectName>${project.name}</projectName>
-						<force>true</force>
 						<licenseFile>${basedir}/LICENSE</licenseFile>
 						<licenseName>apache_v2</licenseName>
 					</configuration>
