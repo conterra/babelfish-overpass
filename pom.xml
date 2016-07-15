@@ -36,7 +36,6 @@
 		<osmosis.version>0.45</osmosis.version>
 		<junit.version>4.12</junit.version>
 		<mockito.version>1.10.19</mockito.version>
-		<plugin.mavenproperties.version>1.0.0</plugin.mavenproperties.version>
 		<plugin.license.version>1.9</plugin.license.version>
 		<plugin.jaxb.version>0.12.1</plugin.jaxb.version>
 		<plugin.findbugs.version>3.0.4</plugin.findbugs.version>
@@ -127,29 +126,6 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<!-- We use this plugin to ensure that our usage of the org.codehaus.mojo:jaxb2-maven-plugin is JDK 8 compatible -->
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>properties-maven-plugin</artifactId>
-					<version>${plugin.mavenproperties.version}</version>
-					<executions>
-						<execution>
-							<id>set-additional-system-properties</id>
-							<phase>generate-sources</phase>
-							<goals>
-								<goal>set-system-properties</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<properties>
-							<property>
-								<name>javax.xml.accessExternalSchema</name>
-								<value>file,http</value>
-							</property>
-						</properties>
-					</configuration>
-				</plugin>
 				<plugin>
 					<groupId>org.jvnet.jaxb2.maven2</groupId>
 					<artifactId>maven-jaxb2-plugin</artifactId>
@@ -255,7 +231,6 @@
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>${plugin.javadoc.version}</version>
 					<configuration>
-						<!-- <additionalparam>-Xdoclint:none</additionalparam> -->
 						<links>
 							<link>http://logging.apache.org/log4j/1.2/apidocs</link>
 							<link>http://www.slf4j.org/api</link>
