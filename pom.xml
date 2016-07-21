@@ -163,8 +163,8 @@
 						<sortArtifactByName>true</sortArtifactByName>
 						<fileTemplate>/org/codehaus/mojo/license/third-party-file-groupByLicense.ftl</fileTemplate>
 						<licenseMerges>
-							<licenseMerge>Apache License, Version 2.0|The Apache Software License, Version 2.0|Apache 2</licenseMerge>
-							<licenseMerge>Individual BSD License|BSD License|BSD License for HSQL|New BSD License|HSQLDB License, a BSD open source license</licenseMerge>
+							<licenseMerge>Apache License, Version 2.0|The Apache Software License, Version 2.0|Apache 2|The Apache License, Version 2.0</licenseMerge>
+							<licenseMerge>Individual BSD License|BSD License|New BSD license|The BSD License|BSD License for HSQL|New BSD License|HSQLDB License, a BSD open source license</licenseMerge>
 							<licenseMerge>The MIT License|The MIT License(MIT)|MIT License</licenseMerge>
 							<licenseMerge>GNU Library or Lesser General Public License version 2.0 (LGPLv2)|Lesser General Public License (LGPL)</licenseMerge>
 						</licenseMerges>
