@@ -29,7 +29,7 @@
 		<java.version>1.8</java.version>
 		<slf4j.version>1.7.21</slf4j.version>
 		<log4j.version>2.6.2</log4j.version>
-		<babelfish.version>0.3.0</babelfish.version>
+		<babelfish.version>0.3.1-SNAPSHOT</babelfish.version>
 		<commonslang.version>3.4</commonslang.version>
 		<commonsio.version>2.5</commonsio.version>
 		<jodatime.version>2.9.4</jodatime.version>
@@ -159,13 +159,23 @@
 					<configuration>
 						<licenseFile>${basedir}/LICENSE</licenseFile>
 						<licenseName>apache_v2</licenseName>
+						<useMissingFile>true</useMissingFile>
+						<sortArtifactByName>true</sortArtifactByName>
+						<fileTemplate>/org/codehaus/mojo/license/third-party-file-groupByLicense.ftl</fileTemplate>
+						<licenseMerges>
+							<licenseMerge>Apache License, Version 2.0|The Apache Software License, Version 2.0|Apache 2</licenseMerge>
+							<licenseMerge>Individual BSD License|BSD License|BSD License for HSQL|New BSD License|HSQLDB License, a BSD open source license</licenseMerge>
+							<licenseMerge>The MIT License|The MIT License(MIT)|MIT License</licenseMerge>
+							<licenseMerge>GNU Library or Lesser General Public License version 2.0 (LGPLv2)|Lesser General Public License (LGPL)</licenseMerge>
+						</licenseMerges>
 					</configuration>
 					<executions>
 						<execution>
-							<id>update-project-license</id>
+							<id>add-licenses</id>
 							<goals>
 								<goal>update-project-license</goal>
 								<goal>add-third-party</goal>
+								<goal>download-licenses</goal>
 							</goals>
 						</execution>
 					</executions>
