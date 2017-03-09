@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	
 	<groupId>de.conterra</groupId>
 	<artifactId>babelfish-overpass</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-
+	
 	<name>tRESTle Babelfish Overpass plugin</name>
 	<url>http://developernetwork.conterra.de</url>
 	<inceptionYear>2016</inceptionYear>
@@ -15,7 +15,7 @@
 		<name>con terra - Gesellschaft für Angewandte Informationstechnologie mbH</name>
 		<url>http://www.conterra.de</url>
 	</organization>
-
+	
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -23,52 +23,33 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<slf4j.version>1.7.21</slf4j.version>
-		<log4j.version>2.6.2</log4j.version>
-		<babelfish.version>0.3.1-SNAPSHOT</babelfish.version>
-		<commonslang.version>3.4</commonslang.version>
+		<slf4j.version>1.7.24</slf4j.version>
+		<babelfish.version>0.4.0-SNAPSHOT</babelfish.version>
+		<commonslang.version>3.5</commonslang.version>
 		<commonsio.version>2.5</commonsio.version>
-		<jodatime.version>2.9.4</jodatime.version>
+		<jodatime.version>2.9.7</jodatime.version>
 		<osmosis.version>0.45</osmosis.version>
 		<junit.version>4.12</junit.version>
-		<mockito.version>1.10.19</mockito.version>
-		<plugin.license.version>1.9</plugin.license.version>
-		<plugin.jaxb.version>0.12.1</plugin.jaxb.version>
+		<mockito.version>2.7.14</mockito.version>
+		<plugin.license.version>1.12</plugin.license.version>
+		<plugin.jaxb.version>0.13.2</plugin.jaxb.version>
 		<plugin.findbugs.version>3.0.4</plugin.findbugs.version>
-		<plugin.compiler.version>3.5.1</plugin.compiler.version>
-		<plugin.shade.version>2.4.3</plugin.shade.version>
+		<plugin.compiler.version>3.6.1</plugin.compiler.version>
+		<plugin.shade.version>3.0.0</plugin.shade.version>
 		<plugin.javadoc.version>2.10.4</plugin.javadoc.version>
 		<plugin.source.version>3.0.1</plugin.source.version>
 		<plugin.release.version>2.5.3</plugin.release.version>
 	</properties>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>${log4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>${log4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j-impl</artifactId>
-			<version>${log4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -117,12 +98,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
+			<artifactId>mockito-core</artifactId>
 			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
+	
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -277,7 +258,7 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	
 	<reporting>
 		<outputDirectory>${project.build.directory}/site</outputDirectory>
 		<plugins>
@@ -288,25 +269,25 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
+	
 	<scm>
 		<developerConnection>scm:git:https://github.com/conterra/babelfish-overpass.git</developerConnection>
 		<url>https://github.com/conterra/babelfish-overpass</url>
 	</scm>
-
+	
 	<distributionManagement>
 		<repository>
 			<id>ct-dist-releases-file</id>
-			<name>repository for sdi.suite releases</name>
+			<name>repository for releases</name>
 			<url>${release.deployment.url}</url>
 		</repository>
 		<snapshotRepository>
 			<id>ct-dist-snapshots-file</id>
-			<name>repository for sdi.suite snapshots</name>
+			<name>repository for snapshots</name>
 			<url>${snapshot.deployment.url}</url>
 		</snapshotRepository>
 	</distributionManagement>
-
+	
 	<profiles>
 		<profile>
 			<id>create-javadoc-and-attach-sources</id>

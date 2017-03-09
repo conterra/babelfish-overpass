@@ -1,15 +1,5 @@
 package de.conterra.babelfish.overpass.plugin;
 
-import java.io.File;
-import java.net.URISyntaxException;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.conterra.babelfish.overpass.config.ServiceType;
 import de.conterra.babelfish.overpass.config.Services;
 import de.conterra.babelfish.overpass.store.FeatureStore;
@@ -17,89 +7,77 @@ import de.conterra.babelfish.overpass.store.PopupStore;
 import de.conterra.babelfish.plugin.Plugin;
 import de.conterra.babelfish.plugin.PluginAdapter;
 import de.conterra.babelfish.plugin.ServiceContainer;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.net.URISyntaxException;
 
 /**
  * defines a {@link Plugin} to send REST requests to the Overpass API
- * 
- * @version 0.0.1
- * @author chwe
- * @since 0.0.1
+ *
+ * @author ChrissW-R1
+ * @version 0.2.0
+ * @since 0.1.0
  */
+@Slf4j
 public class OverpassPlugin
-implements Plugin
-{
-	/**
-	 * the {@link Logger} of this class
-	 * 
-	 * @since 0.1
-	 */
-	public static final Logger LOGGER = LoggerFactory.getLogger(OverpassPlugin.class);
+		implements Plugin {
 	/**
 	 * the only instance of a {@link OverpassPlugin}<br>
 	 * (singleton pattern)
-	 * 
-	 * @since 0.0.1
+	 *
+	 * @since 0.1.0
 	 */
 	public static final OverpassPlugin INSTANCE = new OverpassPlugin();
 	
 	/**
 	 * standard constructor
-	 * 
-	 * @since 0.0.1
+	 *
+	 * @since 0.1.0
 	 */
-	public OverpassPlugin()
-	{
+	public OverpassPlugin() {
 	}
 	
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "Overpass";
 	}
 	
 	@Override
-	public boolean init()
-	{
+	public boolean init() {
 		FeatureStore.start();
 		PopupStore.start();
 		
 		boolean res = true;
 		
-		try
-		{
+		try {
 			File servicesFolder = new File(new File(PluginAdapter.getPluginFolder(OverpassPlugin.INSTANCE).toURI()), "services");
 			
-			if (servicesFolder.exists() || servicesFolder.mkdirs())
-			{
+			if (servicesFolder.exists() || servicesFolder.mkdirs()) {
 				JAXBContext context = JAXBContext.newInstance(Services.class);
 				Unmarshaller unmarshaller = context.createUnmarshaller();
 				
-				for (File file : servicesFolder.listFiles())
-				{
-					try
-					{
+				for (File file : servicesFolder.listFiles()) {
+					try {
 						Services services = (Services) (unmarshaller.unmarshal(file));
 						
-						for (ServiceType xmlService : services.getService())
-						{
-							if ( ! (ServiceContainer.registerService(new OverpassFeatureService(xmlService))))
+						for (ServiceType xmlService : services.getService()) {
+							if (!(ServiceContainer.registerService(new OverpassFeatureService(xmlService))))
 								res = false;
 						}
-					}
-					catch (JAXBException | ClassCastException e)
-					{
+					} catch (JAXBException | ClassCastException e) {
 						String msg = "Could not load a valid Overpass configuration from: " + file.getName();
-						OverpassPlugin.LOGGER.warn(msg, e);
+						log.warn(msg, e);
 					}
 				}
-			}
-			else
-				OverpassPlugin.LOGGER.error("Couldn't create directory \'services\' in which the service configurations must stored!");
-		}
-		catch (NullPointerException | URISyntaxException | JAXBException e)
-		{
+			} else
+				log.error("Couldn't create directory \'services\' in which the service configurations must stored!");
+		} catch (NullPointerException | URISyntaxException | JAXBException e) {
 			String msg = "Exception occurred: " + e.getMessage();
-			OverpassPlugin.LOGGER.error(msg, e);
+			log.error(msg, e);
 			throw new NullPointerException(msg);
 		}
 		
@@ -107,17 +85,15 @@ implements Plugin
 	}
 	
 	@Override
-	public boolean shutdown()
-	{
+	public boolean shutdown() {
 		FeatureStore.stop();
 		PopupStore.stop();
 		PopupStore.clear();
 		
 		boolean res = true;
-		for (OverpassFeatureService service : OverpassFeatureService.SERVICES.values())
-		{
+		for (OverpassFeatureService service : OverpassFeatureService.SERVICES.values()) {
 			OverpassFeatureService.SERVICES.remove(service);
-			if ( !ServiceContainer.unregisterService(service))
+			if (!ServiceContainer.unregisterService(service))
 				res = false;
 		}
 		

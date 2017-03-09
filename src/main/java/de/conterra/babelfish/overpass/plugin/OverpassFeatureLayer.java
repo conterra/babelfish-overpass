@@ -1,39 +1,9 @@
 package de.conterra.babelfish.overpass.plugin;
 
-import java.awt.Color;
-import java.awt.Image;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.imageio.ImageIO;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.conterra.babelfish.overpass.config.FillSymbolType;
-import de.conterra.babelfish.overpass.config.LayerType;
-import de.conterra.babelfish.overpass.config.LineLayerType;
-import de.conterra.babelfish.overpass.config.LineSymbolType;
-import de.conterra.babelfish.overpass.config.NodeLayerType;
-import de.conterra.babelfish.overpass.config.PictureSymbolType;
-import de.conterra.babelfish.overpass.config.PolygonLayerType;
+import de.conterra.babelfish.overpass.config.*;
 import de.conterra.babelfish.overpass.store.FeatureStore;
 import de.conterra.babelfish.plugin.PluginAdapter;
-import de.conterra.babelfish.plugin.v10_02.feature.Attachment;
-import de.conterra.babelfish.plugin.v10_02.feature.Feature;
-import de.conterra.babelfish.plugin.v10_02.feature.FeatureLayer;
-import de.conterra.babelfish.plugin.v10_02.feature.Field;
-import de.conterra.babelfish.plugin.v10_02.feature.Popup;
-import de.conterra.babelfish.plugin.v10_02.feature.PopupType;
-import de.conterra.babelfish.plugin.v10_02.feature.Query;
-import de.conterra.babelfish.plugin.v10_02.feature.Template;
-import de.conterra.babelfish.plugin.v10_02.feature.Type;
+import de.conterra.babelfish.plugin.v10_02.feature.*;
 import de.conterra.babelfish.plugin.v10_02.feature.wrapper.LayerWrapper;
 import de.conterra.babelfish.plugin.v10_02.object.feature.GeometryFeatureObject;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.GeometryObject;
@@ -43,71 +13,69 @@ import de.conterra.babelfish.plugin.v10_02.object.symbol.SimpleLineSymbol;
 import de.conterra.babelfish.plugin.v10_02.object.symbol.style.SFSStyle;
 import de.conterra.babelfish.plugin.v10_02.object.symbol.style.SLSStyle;
 import de.conterra.babelfish.util.DataUtils;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * defines the basic {@link FeatureLayer} to show features from the Overpass API
- * 
- * @version 0.0.1
- * @author chwe
- * @since 0.0.1
- * 
+ *
  * @param <G> the geometry type
+ * @author ChrissW-R1
+ * @version 0.2.0
+ * @since 0.1.0
  */
+@Slf4j
 public abstract class OverpassFeatureLayer<G extends GeometryObject>
-implements FeatureLayer<G, GeometryFeatureObject<G>>
-{
-	/**
-	 * the {@link Logger} of this class
-	 * 
-	 * @since 0.1
-	 */
-	public static final Logger LOGGER = LoggerFactory.getLogger(OverpassFeatureLayer.class);
-	
+		implements FeatureLayer<G, GeometryFeatureObject<G>> {
 	/**
 	 * the geometry type
-	 * 
-	 * @since 0.0.1
+	 *
+	 * @since 0.1.0
 	 */
 	@SuppressWarnings("unused")
 	private final Class<G> geometryType;
 	/**
 	 * the unique identifier
-	 * 
-	 * @since 0.0.1
+	 *
+	 * @since 0.1.0
 	 */
 	private final int id;
 	/**
 	 * the name shown to the user
-	 * 
-	 * @since 0.0.1
+	 *
+	 * @since 0.1.0
 	 */
 	private final String name;
 	/**
 	 * the description shown to the user
-	 * 
-	 * @since 0.0.1
+	 *
+	 * @since 0.1.0
 	 */
 	private final String desc;
 	/**
 	 * the {@link FeatureStore}
-	 * 
-	 * @since 0.0.1
+	 *
+	 * @since 0.1.0
 	 */
 	private final FeatureStore<G> store;
 	
 	/**
 	 * private standard constructor
-	 * 
-	 * @since 0.1.0
-	 * 
+	 *
 	 * @param geometryType the {@link GeometryObject} type
-	 * @param id the unique identifier
-	 * @param name the user friendly name
-	 * @param desc the description show to the user
-	 * @param store the filter of meta data
+	 * @param id           the unique identifier
+	 * @param name         the user friendly name
+	 * @param desc         the description show to the user
+	 * @param store        the filter of meta data
+	 * @since 0.1.0
 	 */
-	private OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, FeatureStore<G> store)
-	{
+	private OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, FeatureStore<G> store) {
 		this.geometryType = geometryType;
 		this.id = id;
 		this.name = name;
@@ -117,55 +85,49 @@ implements FeatureLayer<G, GeometryFeatureObject<G>>
 	
 	/**
 	 * constructor, with given Overpass API script
-	 * 
-	 * @since 0.1.0
-	 * 
+	 *
 	 * @param geometryType the {@link GeometryObject} type
-	 * @param id the unique identifier
-	 * @param name the user friendly name
-	 * @param desc the description show to the user
-	 * @param script the Overpass API script to use for requests
+	 * @param id           the unique identifier
+	 * @param name         the user friendly name
+	 * @param desc         the description show to the user
+	 * @param script       the Overpass API script to use for requests
+	 * @since 0.1.0
 	 */
 	@SuppressWarnings(
-	{
-			"unchecked", "rawtypes"
-	})
-	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, String script)
-	{
+			{
+					"unchecked", "rawtypes"
+			})
+	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, String script) {
 		this(geometryType, id, name, desc, new FeatureStore(geometryType, script));
 	}
 	
 	/**
 	 * constructor, with given meta filter
-	 * 
-	 * @since 0.0.1
-	 * 
+	 *
 	 * @param geometryType the {@link GeometryObject} type
-	 * @param id the unique identifier
-	 * @param name the user friendly name
-	 * @param desc the description show to the user
-	 * @param metaFilter the filter of meta data
+	 * @param id           the unique identifier
+	 * @param name         the user friendly name
+	 * @param desc         the description show to the user
+	 * @param metaFilter   the filter of meta data
+	 * @since 0.1.0
 	 */
 	@SuppressWarnings(
-	{
-			"unchecked", "rawtypes"
-	})
-	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, Set<? extends String> metaFilter)
-	{
+			{
+					"unchecked", "rawtypes"
+			})
+	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, Set<? extends String> metaFilter) {
 		this(geometryType, id, name, desc, new FeatureStore(geometryType, metaFilter));
 	}
 	
 	/**
 	 * parses a {@link LineSymbolType} to a {@link SimpleLineSymbol}
-	 * 
-	 * @since 0.1.0
-	 * 
+	 *
 	 * @param symbol the {@link LineSymbolType} to parse
-	 * @return the {@link SimpleLineSymbol} representation of
-	 *         <code>symbol</code>
+	 * @return the {@link SimpleLineSymbol} representation of {@code symbol}
+	 *
+	 * @since 0.1.0
 	 */
-	private static SimpleLineSymbol parseSymbol(LineSymbolType symbol)
-	{
+	private static SimpleLineSymbol parseSymbol(LineSymbolType symbol) {
 		if (symbol == null)
 			return null;
 		
@@ -174,44 +136,37 @@ implements FeatureLayer<G, GeometryFeatureObject<G>>
 	
 	/**
 	 * creates an {@link OverpassFeatureLayer} from a given {@link LayerType}
-	 * 
-	 * @since 0.0.1
-	 * 
+	 *
 	 * @param layer the {@link LayerType}
 	 * @return the created {@link OverpassFeatureLayer}
-	 * @throws IllegalArgumentException if <code>layer</code> has an unknown
-	 *         type
+	 *
+	 * @throws IllegalArgumentException if {@code layer} has an unknown type
+	 * @since 0.1.0
 	 */
 	public static OverpassFeatureLayer<?> createLayer(LayerType layer)
-	throws IllegalArgumentException
-	{
+			throws IllegalArgumentException {
 		String script = layer.getScript();
 		boolean useScript = script != null && !script.isEmpty();
 		
-		if (layer instanceof NodeLayerType)
-		{
-			NodeLayerType nodeLayer = (NodeLayerType)layer;
+		if (layer instanceof NodeLayerType) {
+			NodeLayerType nodeLayer = (NodeLayerType) layer;
 			
-			OverpassFeatureLayer.LOGGER.debug("Create a layer of nodes from " + nodeLayer.getName());
+			log.debug("Create a layer of nodes from " + nodeLayer.getName());
 			
 			Image image = null;
 			PictureSymbolType symbol = nodeLayer.getSymbol();
 			
-			if (symbol != null)
-			{
-				try
-				{
+			if (symbol != null) {
+				try {
 					File imageFile = new File(new File(PluginAdapter.getPluginFolder(OverpassPlugin.INSTANCE).toURI()), symbol.getPath());
 					
 					if (imageFile.exists())
 						image = ImageIO.read(imageFile);
-				}
-				catch (URISyntaxException | NullPointerException | IOException e)
-				{
+				} catch (URISyntaxException | NullPointerException | IOException e) {
 				}
 				
 				String symbolData = symbol.getData();
-				if (image == null && symbolData != null && ! (symbolData.isEmpty()))
+				if (image == null && symbolData != null && !(symbolData.isEmpty()))
 					image = DataUtils.toImage(DataUtils.decodeBase64(symbolData));
 			}
 			
@@ -219,12 +174,10 @@ implements FeatureLayer<G, GeometryFeatureObject<G>>
 				return new OverpassNodeLayer(nodeLayer.getId(), nodeLayer.getName(), nodeLayer.getDesc(), script, image);
 			
 			return new OverpassNodeLayer(nodeLayer.getId(), nodeLayer.getName(), nodeLayer.getDesc(), new HashSet<>(nodeLayer.getMetaFilter()), image);
-		}
-		else if (layer instanceof LineLayerType)
-		{
-			LineLayerType lineLayer = (LineLayerType)layer;
+		} else if (layer instanceof LineLayerType) {
+			LineLayerType lineLayer = (LineLayerType) layer;
 			
-			OverpassFeatureLayer.LOGGER.debug("Create a layer of lines from " + lineLayer.getName());
+			log.debug("Create a layer of lines from " + lineLayer.getName());
 			
 			SimpleLineSymbol symbol = OverpassFeatureLayer.parseSymbol(lineLayer.getSymbol());
 			
@@ -232,12 +185,10 @@ implements FeatureLayer<G, GeometryFeatureObject<G>>
 				return new OverpassLineLayer(lineLayer.getId(), lineLayer.getName(), lineLayer.getDesc(), script, symbol);
 			
 			return new OverpassLineLayer(lineLayer.getId(), lineLayer.getName(), lineLayer.getDesc(), new HashSet<>(lineLayer.getMetaFilter()), symbol);
-		}
-		else if (layer instanceof PolygonLayerType)
-		{
-			PolygonLayerType polygonLayer = (PolygonLayerType)layer;
+		} else if (layer instanceof PolygonLayerType) {
+			PolygonLayerType polygonLayer = (PolygonLayerType) layer;
 			
-			OverpassFeatureLayer.LOGGER.debug("Create a layer of polygons from " + polygonLayer.getName());
+			log.debug("Create a layer of polygons from " + polygonLayer.getName());
 			
 			SimpleFillSymbol sfs = null;
 			FillSymbolType symbol = polygonLayer.getSymbol();
@@ -252,116 +203,97 @@ implements FeatureLayer<G, GeometryFeatureObject<G>>
 		}
 		
 		String msg = "The given layer have an unknown type!";
-		OverpassFeatureLayer.LOGGER.error(msg);
+		log.error(msg);
 		throw new IllegalArgumentException(msg);
 	}
 	
 	@Override
-	public int getId()
-	{
+	public int getId() {
 		return this.id;
 	}
 	
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return this.name;
 	}
 	
 	@Override
-	public String getDescription()
-	{
+	public String getDescription() {
 		return this.desc;
 	}
 	
 	@Override
-	public String getCopyrightText()
-	{
+	public String getCopyrightText() {
 		return "\u00A9 OpenStreetMap contributors";
 	}
 	
 	@Override
-	public PopupType getPopupType()
-	{
+	public PopupType getPopupType() {
 		return PopupType.HtmlText;
 	}
 	
 	@Override
-	public Field getObjectIdField()
-	{
+	public Field getObjectIdField() {
 		return LayerWrapper.DEFAULT_OBJECT_ID_FIELD;
 	}
 	
 	@Override
-	public Field getGlobalIdField()
-	{
+	public Field getGlobalIdField() {
 		return LayerWrapper.DEFAULT_GLOBAL_ID_FIELD;
 	}
 	
 	@Override
-	public Field getDisplayField()
-	{
-		// TODO Auto-generated method stub
+	public Field getDisplayField() {
+		// ToDo Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public Field getTypeIdField()
-	{
-		// TODO Auto-generated method stub
+	public Field getTypeIdField() {
+		// ToDo Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public Set<? extends Type<GeometryFeatureObject<G>>> getSubTypes()
-	{
+	public Set<? extends Type<GeometryFeatureObject<G>>> getSubTypes() {
 		return new LinkedHashSet<>();
 	}
 	
 	@Override
-	public Set<? extends Template<GeometryFeatureObject<G>>> getTemplates()
-	{
+	public Set<? extends Template<GeometryFeatureObject<G>>> getTemplates() {
 		return new LinkedHashSet<>();
 	}
 	
 	@Override
-	public Query<GeometryFeatureObject<G>> getQuery()
-	{
+	public Query<GeometryFeatureObject<G>> getQuery() {
 		return new OverpassQuery<G>(this.store);
 	}
 	
 	@Override
-	public Map<? extends String, ? extends Image> getImages()
-	{
+	public Map<? extends String, ? extends Image> getImages() {
 		return new LinkedHashMap<>();
 	}
 	
 	@Override
-	public Set<? extends Feature<GeometryFeatureObject<G>>> getFeatures()
-	{
+	public Set<? extends Feature<GeometryFeatureObject<G>>> getFeatures() {
 		Set<Feature<GeometryFeatureObject<G>>> res = new HashSet<>();
 		
-		for (Feature<? extends GeometryFeatureObject<G>> feature : this.getStore().getFeatures().values())
-		{
+		for (Feature<? extends GeometryFeatureObject<G>> feature : this.getStore().getFeatures().values()) {
 			final Feature<? extends GeometryFeatureObject<G>> f = feature;
 			
-			res.add(new Feature<GeometryFeatureObject<G>>()
-			{
+			res.add(new Feature<GeometryFeatureObject<G>>() {
 				@Override
-				public GeometryFeatureObject<G> getFeature()
-				{
+				public GeometryFeatureObject<G> getFeature() {
 					return f.getFeature();
 				}
 				
 				@Override
-				public Set<? extends Attachment> getAttachments()
-				{
+				public Set<? extends Attachment> getAttachments() {
 					return f.getAttachments();
 				}
 				
 				@Override
-				public Popup getPopup()
-				{
+				public Popup getPopup() {
 					return f.getPopup();
 				}
 			});
@@ -371,38 +303,33 @@ implements FeatureLayer<G, GeometryFeatureObject<G>>
 	}
 	
 	@Override
-	public int getMinScale()
-	{
+	public int getMinScale() {
 		return 0;
 	}
 	
 	@Override
-	public int getMaxScale()
-	{
+	public int getMaxScale() {
 		return 0;
 	}
 	
 	@Override
-	public int getTranparency()
-	{
+	public int getTranparency() {
 		return 0;
 	}
 	
 	@Override
-	public LabelingInfo getLabelingInfo()
-	{
+	public LabelingInfo getLabelingInfo() {
 		return null;
 	}
 	
 	/**
 	 * gives the {@link FeatureStore}
-	 * 
-	 * @since 0.0.1
-	 * 
+	 *
 	 * @return the {@link FeatureStore}
+	 *
+	 * @since 0.1.0
 	 */
-	public FeatureStore<G> getStore()
-	{
+	public FeatureStore<G> getStore() {
 		return this.store;
 	}
 }

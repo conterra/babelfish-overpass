@@ -1,8 +1,8 @@
 /**
  * root package
- * 
- * @author chwe
- * @version 0.0.1
- * @since 0.0.1
+ *
+ * @author ChrissW-R1
+ * @version 0.1.0
+ * @since 0.1.0
  */
 package de.conterra.babelfish.overpass;
