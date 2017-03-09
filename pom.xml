@@ -27,6 +27,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
+		<lombok.version>1.16.12</lombok.version>
 		<slf4j.version>1.7.24</slf4j.version>
 		<babelfish.version>0.4.0-SNAPSHOT</babelfish.version>
 		<commonslang.version>3.5</commonslang.version>
@@ -46,6 +47,11 @@
 	</properties>
 	
 	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
