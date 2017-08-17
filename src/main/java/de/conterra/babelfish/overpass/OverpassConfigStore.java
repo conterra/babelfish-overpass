@@ -1,6 +1,6 @@
 package de.conterra.babelfish.overpass;
 
-import de.conterra.babelfish.overpass.config.OverpassConfigType;
+import de.conterra.babelfish.overpass.config.Config;
 import de.conterra.babelfish.overpass.plugin.OverpassPlugin;
 import de.conterra.babelfish.plugin.PluginAdapter;
 import lombok.extern.slf4j.Slf4j;
@@ -32,26 +32,26 @@ public class OverpassConfigStore {
 	 *
 	 * @since 0.1.0
 	 */
-	public static final long RETRY_DELAY;
+	public static final long   RETRY_DELAY;
 	/**
 	 * the timeout of a Overpass request (in seconds)
 	 *
 	 * @since 0.1.0
 	 */
-	public static final int REQUEST_TIMEOUT;
+	public static final int    REQUEST_TIMEOUT;
 	
 	static {
-		String serviceUrl = "http://overpass-api.de/api/";
-		long retryDelay = 1000;
-		int requestTimeout = 30;
+		String serviceUrl     = "http://overpass-api.de/api/";
+		long   retryDelay     = 1000;
+		int    requestTimeout = 30;
 		
 		try {
 			File configFile = new File(new File(PluginAdapter.getPluginFolder(OverpassPlugin.INSTANCE).toURI()), "config.xml");
 			
-			JAXBContext conext = JAXBContext.newInstance(OverpassConfigType.class);
+			JAXBContext  conext       = JAXBContext.newInstance(Config.class);
 			Unmarshaller unmarshaller = conext.createUnmarshaller();
 			
-			OverpassConfigType config = (OverpassConfigType) unmarshaller.unmarshal(configFile);
+			Config config = (Config) unmarshaller.unmarshal(configFile);
 			
 			serviceUrl = config.getServiceUrl();
 			retryDelay = config.getRetryDelay();
