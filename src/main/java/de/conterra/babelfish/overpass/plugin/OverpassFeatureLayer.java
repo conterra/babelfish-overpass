@@ -1,8 +1,10 @@
 package de.conterra.babelfish.overpass.plugin;
 
 import de.conterra.babelfish.overpass.config.*;
+import de.conterra.babelfish.overpass.io.OsmFile;
 import de.conterra.babelfish.overpass.store.FeatureStore;
-import de.conterra.babelfish.plugin.PluginAdapter;
+import de.conterra.babelfish.overpass.store.FileFeatureStore;
+import de.conterra.babelfish.overpass.store.OverpassFeatureStore;
 import de.conterra.babelfish.plugin.v10_02.feature.*;
 import de.conterra.babelfish.plugin.v10_02.feature.wrapper.LayerWrapper;
 import de.conterra.babelfish.plugin.v10_02.object.feature.GeometryFeatureObject;
@@ -18,8 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -39,25 +41,25 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	 * @since 0.1.0
 	 */
 	@SuppressWarnings("unused")
-	private final Class<G> geometryType;
+	private final Class<G>        geometryType;
 	/**
 	 * the unique identifier
 	 *
 	 * @since 0.1.0
 	 */
-	private final int id;
+	private final int             id;
 	/**
 	 * the name shown to the user
 	 *
 	 * @since 0.1.0
 	 */
-	private final String name;
+	private final String          name;
 	/**
 	 * the description shown to the user
 	 *
 	 * @since 0.1.0
 	 */
-	private final String desc;
+	private final String          desc;
 	/**
 	 * the {@link FeatureStore}
 	 *
@@ -98,7 +100,7 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 					"unchecked", "rawtypes"
 			})
 	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, String script) {
-		this(geometryType, id, name, desc, new FeatureStore(geometryType, script));
+		this(geometryType, id, name, desc, new OverpassFeatureStore(geometryType, script));
 	}
 	
 	/**
@@ -116,7 +118,22 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 					"unchecked", "rawtypes"
 			})
 	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, Set<? extends String> metaFilter) {
-		this(geometryType, id, name, desc, new FeatureStore(geometryType, metaFilter));
+		this(geometryType, id, name, desc, new OverpassFeatureStore(geometryType, metaFilter));
+	}
+	
+	/**
+	 * constructor, with given data {@link File}
+	 *
+	 * @param geometryType the {@link GeometryObject} type
+	 * @param id           the unique identifier
+	 * @param name         the user friendly name
+	 * @param desc         the description show to the user
+	 * @param file         the {@link OsmFile} to get the features from
+	 * @since 0.2.0
+	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, OsmFile file) {
+		this(geometryType, id, name, desc, new FileFeatureStore(geometryType, file));
 	}
 	
 	/**
@@ -128,8 +145,9 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	 * @since 0.1.0
 	 */
 	private static SimpleLineSymbol parseSymbol(LineSymbolType symbol) {
-		if (symbol == null)
+		if (symbol == null) {
 			return null;
+		}
 		
 		return new SimpleLineSymbol(SLSStyle.valueOf(symbol.getStyle().value()), Color.decode(symbol.getColor()), symbol.getWidth());
 	}
@@ -140,40 +158,63 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	 * @param layer the {@link LayerType}
 	 * @return the created {@link OverpassFeatureLayer}
 	 *
+	 * @throws IOException              id the {@link OsmFile} couldn't load
 	 * @throws IllegalArgumentException if {@code layer} has an unknown type
 	 * @since 0.1.0
 	 */
 	public static OverpassFeatureLayer<?> createLayer(LayerType layer)
-			throws IllegalArgumentException {
-		String script = layer.getScript();
-		boolean useScript = script != null && !script.isEmpty();
+	throws IOException, IllegalArgumentException {
+		String  script    = layer.getScript();
+		boolean useScript = script != null && !(script.isEmpty());
+		
+		FileType fileInfo = layer.getFile();
+		boolean  useFile  = !useScript && (fileInfo != null);
+		OsmFile  dataFile = null;
+		if (useFile) {
+			String filePath = fileInfo.getPath();
+			String errorMsg = "Couldn't load file from given path! (" + filePath + ")";
+			
+			File file = new File(OverpassPlugin.SERVICES_FOLDER, filePath);
+			
+			if (!(file.exists())) {
+				throw new IOException(errorMsg, new FileNotFoundException());
+			}
+			
+			dataFile = new OsmFile(file, fileInfo.getType(), fileInfo.getCompression());
+		}
 		
 		if (layer instanceof NodeLayerType) {
 			NodeLayerType nodeLayer = (NodeLayerType) layer;
 			
 			log.debug("Create a layer of nodes from " + nodeLayer.getName());
 			
-			Image image = null;
+			Image             image  = null;
 			PictureSymbolType symbol = nodeLayer.getSymbol();
 			
 			if (symbol != null) {
 				try {
-					File imageFile = new File(new File(PluginAdapter.getPluginFolder(OverpassPlugin.INSTANCE).toURI()), symbol.getPath());
+					File imageFile = new File(OverpassPlugin.SERVICES_FOLDER, symbol.getPath());
 					
-					if (imageFile.exists())
+					if (imageFile.exists()) {
 						image = ImageIO.read(imageFile);
-				} catch (URISyntaxException | NullPointerException | IOException e) {
+					}
+				} catch (NullPointerException | IOException e) {
+					log.debug("Symbol couldn't load from file: " + symbol.getPath(), e);
 				}
 				
 				String symbolData = symbol.getData();
-				if (image == null && symbolData != null && !(symbolData.isEmpty()))
+				if (image == null && symbolData != null && !(symbolData.isEmpty())) {
 					image = DataUtils.toImage(DataUtils.decodeBase64(symbolData));
+				}
 			}
 			
-			if (useScript)
+			if (useFile) {
+				return new OverpassNodeLayer(nodeLayer.getId(), nodeLayer.getName(), nodeLayer.getDesc(), dataFile, image);
+			} else if (useScript) {
 				return new OverpassNodeLayer(nodeLayer.getId(), nodeLayer.getName(), nodeLayer.getDesc(), script, image);
-			
-			return new OverpassNodeLayer(nodeLayer.getId(), nodeLayer.getName(), nodeLayer.getDesc(), new HashSet<>(nodeLayer.getMetaFilter()), image);
+			} else {
+				return new OverpassNodeLayer(nodeLayer.getId(), nodeLayer.getName(), nodeLayer.getDesc(), new HashSet<>(nodeLayer.getMetaFilter()), image);
+			}
 		} else if (layer instanceof LineLayerType) {
 			LineLayerType lineLayer = (LineLayerType) layer;
 			
@@ -181,28 +222,35 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 			
 			SimpleLineSymbol symbol = OverpassFeatureLayer.parseSymbol(lineLayer.getSymbol());
 			
-			if (useScript)
+			if (useFile) {
+				return new OverpassLineLayer(lineLayer.getId(), lineLayer.getName(), lineLayer.getDesc(), dataFile, symbol);
+			} else if (useScript) {
 				return new OverpassLineLayer(lineLayer.getId(), lineLayer.getName(), lineLayer.getDesc(), script, symbol);
-			
-			return new OverpassLineLayer(lineLayer.getId(), lineLayer.getName(), lineLayer.getDesc(), new HashSet<>(lineLayer.getMetaFilter()), symbol);
+			} else {
+				return new OverpassLineLayer(lineLayer.getId(), lineLayer.getName(), lineLayer.getDesc(), new HashSet<>(lineLayer.getMetaFilter()), symbol);
+			}
 		} else if (layer instanceof PolygonLayerType) {
 			PolygonLayerType polygonLayer = (PolygonLayerType) layer;
 			
 			log.debug("Create a layer of polygons from " + polygonLayer.getName());
 			
-			SimpleFillSymbol sfs = null;
-			FillSymbolType symbol = polygonLayer.getSymbol();
+			SimpleFillSymbol sfs    = null;
+			FillSymbolType   symbol = polygonLayer.getSymbol();
 			
-			if (symbol != null)
+			if (symbol != null) {
 				sfs = new SimpleFillSymbol(SFSStyle.Solid, Color.decode(symbol.getColor()), OverpassFeatureLayer.parseSymbol(symbol.getOutline()));
+			}
 			
-			if (useScript)
+			if (useFile) {
+				return new OverpassPolygonLayer(polygonLayer.getId(), polygonLayer.getName(), polygonLayer.getDesc(), dataFile, sfs);
+			} else if (useScript) {
 				return new OverpassPolygonLayer(polygonLayer.getId(), polygonLayer.getName(), polygonLayer.getDesc(), script, sfs);
-			
-			return new OverpassPolygonLayer(polygonLayer.getId(), polygonLayer.getName(), polygonLayer.getDesc(), new HashSet<>(polygonLayer.getMetaFilter()), sfs);
+			} else {
+				return new OverpassPolygonLayer(polygonLayer.getId(), polygonLayer.getName(), polygonLayer.getDesc(), new HashSet<>(polygonLayer.getMetaFilter()), sfs);
+			}
 		}
 		
-		String msg = "The given layer have an unknown type!";
+		String msg = "The given layer has an unknown type!";
 		log.error(msg);
 		throw new IllegalArgumentException(msg);
 	}

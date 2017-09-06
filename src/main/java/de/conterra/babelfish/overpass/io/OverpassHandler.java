@@ -1,5 +1,6 @@
 package de.conterra.babelfish.overpass.io;
 
+import crosby.binary.osmosis.OsmosisReader;
 import de.conterra.babelfish.overpass.OverpassConfigStore;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.*;
 import de.conterra.babelfish.util.GeoUtils;
@@ -13,15 +14,11 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.domain.v0_6.*;
+import org.openstreetmap.osmosis.core.task.v0_6.RunnableSource;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
-import org.openstreetmap.osmosis.xml.v0_6.impl.OsmHandler;
-import org.xml.sax.SAXException;
+import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -84,7 +81,7 @@ public class OverpassHandler {
 	 * @since 0.1.0
 	 */
 	private static InputStream request(String script, Envelope bbox)
-			throws IllegalArgumentException, IOException {
+	throws IllegalArgumentException, IOException {
 		if (!script.contains(OverpassHandler.BBOX_PLACEHOLDER)) {
 			throw new IllegalArgumentException("The script must contain one or more \"{{bbox}}\"!");
 		}
@@ -92,7 +89,7 @@ public class OverpassHandler {
 		String timeoutStartTag = "[timeout:";
 		
 		int idxTimeoutStart = script.indexOf(timeoutStartTag);
-		int idxTimeoutEnd = idxTimeoutStart < 0 ? 0 : script.indexOf("]", idxTimeoutStart);
+		int idxTimeoutEnd   = idxTimeoutStart < 0 ? 0 : script.indexOf("]", idxTimeoutStart);
 		
 		if (idxTimeoutStart < 0) {
 			idxTimeoutStart = 0;
@@ -247,6 +244,51 @@ public class OverpassHandler {
 	}
 	
 	/**
+	 * reads all {@link Entity}s from a given {@link RunnableSource}
+	 *
+	 * @param reader the {@link RunnableSource} to read
+	 * @return a {@link Map} of all read features
+	 *
+	 * @since 0.2.0
+	 */
+	private static Map<? extends Long, ? extends Entity> readFeatures(RunnableSource reader) {
+		final Map<Long, Entity> res = new HashMap<>();
+		
+		reader.setSink(new Sink() {
+			@Override
+			public void process(EntityContainer entityContainer) {
+				Entity entity = entityContainer.getEntity();
+				
+				res.put(entity.getId(), entity);
+			}
+			
+			@Override
+			public void initialize(Map<String, Object> map) {
+			}
+			
+			@Override
+			public void complete() {
+			}
+			
+			@Override
+			public void release() {
+			}
+		});
+		
+		Thread readerThread = new Thread(reader);
+		readerThread.start();
+		
+		while (readerThread.isAlive()) {
+			try {
+				readerThread.join();
+			} catch (InterruptedException e) {
+			}
+		}
+		
+		return res;
+	}
+	
+	/**
 	 * gives a {@link Set} of all requested {@link Entity}s
 	 *
 	 * @param script the Overpass API script to request on the server
@@ -258,44 +300,41 @@ public class OverpassHandler {
 	 * @since 0.1.0
 	 */
 	public static Map<? extends Long, ? extends Entity> getFeatures(String script, Envelope bbox)
-			throws IllegalArgumentException, IOException {
-		try {
-			InputStream is = OverpassHandler.request(script, bbox);
-			
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			
-			final Map<Long, Entity> res = new HashMap<>();
-			
-			Sink sink = new Sink() {
-				@Override
-				public void process(EntityContainer entityContainer) {
-					Entity entity = entityContainer.getEntity();
-					
-					res.put(entity.getId(), entity);
-				}
-				
-				@Override
-				public void release() {
-				}
-				
-				@Override
-				public void complete() {
-				}
-				
-				@Override
-				public void initialize(Map<String, Object> metaData) {
-				}
-			};
-			
-			parser.parse(is, new OsmHandler(sink, true));
-			
-			log.debug("Received " + res.size() + " features.");
-			
-			return res;
-		} catch (ParserConfigurationException | SAXException e) {
-			String msg = "An error occurred while parsing the Overpass API response!";
-			log.error(msg, e);
-			throw new IOException(msg, e);
+	throws IllegalArgumentException, IOException {
+		return OverpassHandler.readFeatures(new OsmosisReader(OverpassHandler.request(script, bbox)));
+	}
+	
+	/**
+	 * gives a {@link Set} of all {@link Entity}s from a {@link File}
+	 *
+	 * @param file the {@link OsmFile} to read from
+	 * @return a {@link Set} of all {@link Entity}s read from the data {@link File}
+	 *
+	 * @throws IllegalArgumentException if a inconsistent set of {@code dataFile}, {@code fileFormat} and {@code compression}
+	 * @throws FileNotFoundException    if the given {@link File} doesn't exist or is {@code null}
+	 * @since 0.2.0
+	 */
+	public static Map<? extends Long, ? extends Entity> getFeatures(OsmFile file)
+	throws IllegalArgumentException, FileNotFoundException {
+		File dataFile = file.getDataFile();
+		
+		if (dataFile == null || !(dataFile.exists())) {
+			throw new FileNotFoundException();
 		}
+		
+		RunnableSource reader;
+		
+		switch (file.getFileFormat()) {
+			case XML:
+				reader = new XmlReader(file.getDataFile(), true, file.getCompression());
+				break;
+			case PBF:
+				reader = new OsmosisReader(new FileInputStream(file.getDataFile()));
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown file format!");
+		}
+		
+		return OverpassHandler.readFeatures(reader);
 	}
 }

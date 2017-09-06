@@ -49,10 +49,10 @@ public class FeatureConverter {
 	 * @since 0.1.0
 	 */
 	public static <G extends GeometryObject> Map<? extends Long, ? extends Feature<? extends GeometryFeatureObject<G>>> convert(Class<G> clazz, Map<? extends Long, ? extends Entity> features) {
-		Map<Long, Point> points = new LinkedHashMap<>();
-		Map<Long, Polyline> lines = new LinkedHashMap<>();
-		Map<Long, Map<Field, Object>> metas = new LinkedHashMap<>();
-		Map<String, OverpassField> metaKeys = new LinkedHashMap<>();
+		Map<Long, Point>              points   = new LinkedHashMap<>();
+		Map<Long, Polyline>           lines    = new LinkedHashMap<>();
+		Map<Long, Map<Field, Object>> metas    = new LinkedHashMap<>();
+		Map<String, OverpassField>    metaKeys = new LinkedHashMap<>();
 		
 		for (long id : features.keySet()) {
 			Entity entity = features.get(id);
@@ -72,7 +72,7 @@ public class FeatureConverter {
 						double ordinate = Double.parseDouble((String) metaTags.get("ele"));
 						pos.setOrdinate(2, ordinate);
 						
-						log.debug("Added thrid ordinate " + ordinate + " to node " + id + ".");
+						log.debug("Added third ordinate " + ordinate + " to node " + id + ".");
 					}
 				} catch (ClassCastException | NumberFormatException e) {
 					log.warn("Couldn't parse the third ordinate from ele tag!", e);
@@ -106,7 +106,7 @@ public class FeatureConverter {
 			
 			log.debug("Entity " + id + " is a " + entity.getType() + ".");
 			
-			Set<Tag> metaTags = new HashSet<>(entity.getTags());
+			Set<Tag>           metaTags   = new HashSet<>(entity.getTags());
 			Map<Field, Object> metaFields = new LinkedHashMap<>();
 			
 			metaFields.put(LayerWrapper.DEFAULT_OBJECT_ID_FIELD, id);

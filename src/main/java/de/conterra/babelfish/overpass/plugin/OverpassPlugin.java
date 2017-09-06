@@ -31,7 +31,13 @@ public class OverpassPlugin
 	 *
 	 * @since 0.1.0
 	 */
-	public static final OverpassPlugin INSTANCE = new OverpassPlugin();
+	public static final OverpassPlugin INSTANCE        = new OverpassPlugin();
+	/**
+	 * the services directory, where all configuration and data {@link File}s are stored
+	 *
+	 * @since 0.2.0
+	 */
+	public static       File           SERVICES_FOLDER = null;
 	
 	/**
 	 * standard constructor
@@ -54,27 +60,31 @@ public class OverpassPlugin
 		boolean res = true;
 		
 		try {
-			File servicesFolder = new File(new File(PluginAdapter.getPluginFolder(OverpassPlugin.INSTANCE).toURI()), "services");
+			if (OverpassPlugin.SERVICES_FOLDER == null) {
+				OverpassPlugin.SERVICES_FOLDER = new File(new File(PluginAdapter.getPluginFolder(OverpassPlugin.INSTANCE).toURI()), "services");
+			}
 			
-			if (servicesFolder.exists() || servicesFolder.mkdirs()) {
-				JAXBContext context = JAXBContext.newInstance(Services.class);
+			if (OverpassPlugin.SERVICES_FOLDER.exists() || OverpassPlugin.SERVICES_FOLDER.mkdirs()) {
+				JAXBContext  context      = JAXBContext.newInstance(Services.class);
 				Unmarshaller unmarshaller = context.createUnmarshaller();
 				
-				for (File file : servicesFolder.listFiles()) {
+				for (File file : OverpassPlugin.SERVICES_FOLDER.listFiles()) {
 					try {
 						Services services = (Services) (unmarshaller.unmarshal(file));
 						
 						for (ServiceType xmlService : services.getService()) {
-							if (!(ServiceContainer.registerService(new OverpassFeatureService(xmlService))))
+							if (!(ServiceContainer.registerService(new OverpassFeatureService(xmlService)))) {
 								res = false;
+							}
 						}
 					} catch (JAXBException | ClassCastException e) {
 						String msg = "Could not load a valid Overpass configuration from: " + file.getName();
 						log.warn(msg, e);
 					}
 				}
-			} else
+			} else {
 				log.error("Couldn't create directory \'services\' in which the service configurations must stored!");
+			}
 		} catch (NullPointerException | URISyntaxException | JAXBException e) {
 			String msg = "Exception occurred: " + e.getMessage();
 			log.error(msg, e);
@@ -93,8 +103,9 @@ public class OverpassPlugin
 		boolean res = true;
 		for (OverpassFeatureService service : OverpassFeatureService.SERVICES.values()) {
 			OverpassFeatureService.SERVICES.remove(service);
-			if (!ServiceContainer.unregisterService(service))
+			if (!ServiceContainer.unregisterService(service)) {
 				res = false;
+			}
 		}
 		
 		return res;

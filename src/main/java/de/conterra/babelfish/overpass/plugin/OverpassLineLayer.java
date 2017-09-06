@@ -1,5 +1,6 @@
 package de.conterra.babelfish.overpass.plugin;
 
+import de.conterra.babelfish.overpass.io.OsmFile;
 import de.conterra.babelfish.plugin.v10_02.feature.FeatureLayer;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.Polyline;
 import de.conterra.babelfish.plugin.v10_02.object.renderer.RendererObject;
@@ -15,7 +16,7 @@ import java.util.Set;
  * defines an {@link FeatureLayer}, which shows {@link Way}s as {@link Polyline}s
  *
  * @author ChrissW-R1
- * @version 0.1.0
+ * @version 0.2.0
  * @since 0.1.0
  */
 public class OverpassLineLayer
@@ -67,6 +68,22 @@ public class OverpassLineLayer
 	}
 	
 	/**
+	 * constructor, with given {@link OsmFile} to get the features from
+	 *
+	 * @param id     the unique identifier
+	 * @param name   the user-friendly name
+	 * @param desc   the description
+	 * @param file   the {@link OsmFile} to get the features from
+	 * @param symbol the {@link SimpleLineSymbol} to render the {@link Way}s
+	 * @since 0.2.0
+	 */
+	public OverpassLineLayer(int id, String name, String desc, OsmFile file, SimpleLineSymbol symbol) {
+		super(Polyline.class, id, name, desc, file);
+		
+		this.renderer = OverpassLineLayer.createRenderer(name, symbol);
+	}
+	
+	/**
 	 * creates a {@link RendererObject} to render {@link Polyline}s with a {@link SimpleLineSymbol}
 	 *
 	 * @param name   the label text
@@ -78,10 +95,11 @@ public class OverpassLineLayer
 	private static RendererObject createRenderer(String name, SimpleLineSymbol symbol) {
 		SimpleLineSymbol sls;
 		
-		if (symbol != null)
+		if (symbol != null) {
 			sls = symbol;
-		else
+		} else {
 			sls = OverpassLineLayer.DEFAULT_SYMBOL;
+		}
 		
 		return new SimpleRenderer(sls, name);
 	}

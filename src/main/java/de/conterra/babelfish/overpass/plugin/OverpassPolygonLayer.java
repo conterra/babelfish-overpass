@@ -1,5 +1,6 @@
 package de.conterra.babelfish.overpass.plugin;
 
+import de.conterra.babelfish.overpass.io.OsmFile;
 import de.conterra.babelfish.plugin.v10_02.feature.FeatureLayer;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.Polygon;
 import de.conterra.babelfish.plugin.v10_02.object.renderer.RendererObject;
@@ -16,7 +17,7 @@ import java.util.Set;
  * defines an {@link FeatureLayer}, which shows {@link Way}s as {@link Polygon}s
  *
  * @author ChrissW-R1
- * @version 0.1.0
+ * @version 0.2.0
  * @since 0.1.0
  */
 public class OverpassPolygonLayer
@@ -68,6 +69,22 @@ public class OverpassPolygonLayer
 	}
 	
 	/**
+	 * constructor, with given {@link OsmFile} to get the features from
+	 *
+	 * @param id     the unique identifier
+	 * @param name   the user-friendly name
+	 * @param desc   the description
+	 * @param file   the {@link OsmFile} to get the features from
+	 * @param symbol the {@link SimpleFillSymbol} to render the {@link Way}s
+	 * @since 0.2.0
+	 */
+	public OverpassPolygonLayer(int id, String name, String desc, OsmFile file, SimpleFillSymbol symbol) {
+		super(Polygon.class, id, name, desc, file);
+		
+		this.renderer = OverpassPolygonLayer.createRenderer(name, symbol);
+	}
+	
+	/**
 	 * creates a {@link RendererObject} to render {@link Polygon}s with a {@link SimpleLineSymbol}
 	 *
 	 * @param name   the label text
@@ -79,10 +96,11 @@ public class OverpassPolygonLayer
 	private static RendererObject createRenderer(String name, SimpleFillSymbol symbol) {
 		SimpleFillSymbol sfs;
 		
-		if (symbol != null)
+		if (symbol != null) {
 			sfs = symbol;
-		else
+		} else {
 			sfs = OverpassPolygonLayer.DEFAULT_SYMBOL;
+		}
 		
 		return new SimpleRenderer(sfs, name);
 	}

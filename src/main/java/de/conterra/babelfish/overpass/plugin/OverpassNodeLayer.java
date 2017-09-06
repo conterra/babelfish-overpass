@@ -1,5 +1,6 @@
 package de.conterra.babelfish.overpass.plugin;
 
+import de.conterra.babelfish.overpass.io.OsmFile;
 import de.conterra.babelfish.plugin.v10_02.feature.FeatureLayer;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.Point;
 import de.conterra.babelfish.plugin.v10_02.object.renderer.RendererObject;
@@ -15,7 +16,7 @@ import java.util.Set;
  * defines an {@link FeatureLayer}, which shows {@link Node}s
  *
  * @author ChrissW-R1
- * @version 0.1.0
+ * @version 0.2.0
  * @since 0.1.0
  */
 public class OverpassNodeLayer
@@ -67,6 +68,22 @@ public class OverpassNodeLayer
 	}
 	
 	/**
+	 * constructor, with given {@link OsmFile}
+	 *
+	 * @param id    the unique identifier
+	 * @param name  the user-friendly name
+	 * @param desc  the description
+	 * @param file  the {@link OsmFile} to get the features from
+	 * @param image the {@link Image} with which the points will be rendered
+	 * @since 0.2.0
+	 */
+	public OverpassNodeLayer(int id, String name, String desc, OsmFile file, Image image) {
+		super(Point.class, id, name, desc, file);
+		
+		this.renderer = OverpassNodeLayer.createRenderer(name, image);
+	}
+	
+	/**
 	 * creates a {@link RendererObject} to render {@link Point}s with an {@link Image}
 	 *
 	 * @param name  the label text
@@ -78,10 +95,11 @@ public class OverpassNodeLayer
 	private static RendererObject createRenderer(String name, Image image) {
 		Image img;
 		
-		if (image != null)
+		if (image != null) {
 			img = image;
-		else
+		} else {
 			img = OverpassNodeLayer.DEFAULT_IMAGE;
+		}
 		
 		return new SimpleRenderer(new PictureMarkerSymbol(img), name);
 	}

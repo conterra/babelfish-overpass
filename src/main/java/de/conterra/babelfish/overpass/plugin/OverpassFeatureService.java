@@ -10,6 +10,7 @@ import de.conterra.babelfish.util.DataUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -71,10 +72,10 @@ public class OverpassFeatureService
 	public OverpassFeatureService(ServiceType service) {
 		this(service.getId(), service.getDesc());
 		
-		for (LayerType xmlLayer : service.getNodeLayerAndLineLayerAndPolygonLayer()) {
+		for (LayerType xmlLayer : service.getNodeLayerOrLineLayerOrPolygonLayer()) {
 			try {
 				this.addLayer(OverpassFeatureLayer.createLayer(xmlLayer));
-			} catch (IllegalArgumentException e) {
+			} catch (IOException | IllegalArgumentException e) {
 				log.warn("Couldn't add layer " + xmlLayer.getName() + "! Failure on parsing!", e);
 			}
 		}
