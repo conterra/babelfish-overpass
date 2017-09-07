@@ -4,6 +4,7 @@ import de.conterra.babelfish.plugin.v10_02.feature.Field;
 import de.conterra.babelfish.plugin.v10_02.feature.FieldType;
 import de.conterra.babelfish.plugin.v10_02.object.domain.DomainObject;
 import de.conterra.babelfish.plugin.v10_02.object.domain.RangeDomain;
+import org.apache.commons.lang3.StringUtils;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.osmbinary.Osmformat.ChangeSet;
@@ -22,14 +23,14 @@ public class OverpassField
 	 *
 	 * @since 0.1.0
 	 */
-	public static final OverpassField USER_FIELD = new OverpassField("osm:user");
+	public static final OverpassField USER_FIELD       = new OverpassField("osm:user");
 	/**
 	 * {@link OverpassField}, which stores the version<br>
 	 * (how many changes were made on the {@link Entity}
 	 *
 	 * @since 0.1.0
 	 */
-	public static final OverpassField VERSION_FIELD = new OverpassField("osm:version") {
+	public static final OverpassField VERSION_FIELD    = new OverpassField("osm:version") {
 		private final int maxIntLength = Integer.toString(Integer.MAX_VALUE).length();
 		private final RangeDomain domain = new RangeDomain("version range", 1, Integer.MAX_VALUE);
 		
@@ -69,7 +70,7 @@ public class OverpassField
 	 *
 	 * @since 0.1.0
 	 */
-	public static final OverpassField CHANGESET_FIELD = new OverpassField("osm:changeset") {
+	public static final OverpassField CHANGESET_FIELD  = new OverpassField("osm:changeset") {
 		private final int maxLongLength = Long.toString(Long.MAX_VALUE).length();
 		
 		@Override
@@ -122,7 +123,7 @@ public class OverpassField
 	
 	@Override
 	public String getAlias() {
-		return "";
+		return StringUtils.EMPTY;
 	}
 	
 	@Override

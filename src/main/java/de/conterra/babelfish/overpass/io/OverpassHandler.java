@@ -6,6 +6,7 @@ import de.conterra.babelfish.plugin.v10_02.object.geometry.*;
 import de.conterra.babelfish.util.GeoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
@@ -95,7 +96,7 @@ public class OverpassHandler {
 			idxTimeoutStart = 0;
 		}
 		
-		String timeoutEndTag = idxTimeoutEnd <= 0 ? "];" : "";
+		String timeoutEndTag = idxTimeoutEnd <= 0 ? "];" : StringUtils.EMPTY;
 		
 		script = script.substring(0, idxTimeoutStart) + timeoutStartTag + OverpassConfigStore.REQUEST_TIMEOUT + timeoutEndTag + script.substring(idxTimeoutEnd);
 		
@@ -120,8 +121,8 @@ public class OverpassHandler {
 			
 			script = script.replace(OverpassHandler.BBOX_PLACEHOLDER, bboxString);
 		} else {
-			script = script.replace("(" + OverpassHandler.BBOX_PLACEHOLDER + ")", "");
-			script = script.replace(OverpassHandler.BBOX_PLACEHOLDER, "");
+			script = script.replace("(" + OverpassHandler.BBOX_PLACEHOLDER + ")", StringUtils.EMPTY);
+			script = script.replace(OverpassHandler.BBOX_PLACEHOLDER, StringUtils.EMPTY);
 		}
 		
 		try {

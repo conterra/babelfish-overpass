@@ -6,6 +6,7 @@ import de.conterra.babelfish.plugin.v10_02.object.geometry.Envelope;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.GeometryObject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.jts.JTS;
@@ -57,7 +58,7 @@ public class OverpassFeatureStore<G extends GeometryObject>
 	public OverpassFeatureStore(Class<G> type, Set<? extends String> metaFilter) {
 		super(type);
 		
-		String script = "";
+		String script = StringUtils.EMPTY;
 		
 		switch (this.getEntityType()) {
 			case Way:
