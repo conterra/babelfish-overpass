@@ -292,8 +292,7 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	
 	@Override
 	public Field getDisplayField() {
-		// ToDo Auto-generated method stub
-		return null;
+		return OverpassField.NAME_FIELD;
 	}
 	
 	@Override

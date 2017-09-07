@@ -54,6 +54,8 @@ public class FeatureConverter {
 		Map<Long, Map<Field, Object>> metas    = new LinkedHashMap<>();
 		Map<String, OverpassField>    metaKeys = new LinkedHashMap<>();
 		
+		metaKeys.put(OverpassField.NAME_FIELD.getName(), OverpassField.NAME_FIELD);
+		
 		for (long id : features.keySet()) {
 			Entity entity = features.get(id);
 			

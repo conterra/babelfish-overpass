@@ -13,7 +13,7 @@ import org.openstreetmap.osmosis.osmbinary.Osmformat.ChangeSet;
  * defines an OpenStreetMap meta key
  *
  * @author ChrissW-R1
- * @version 0.1.0
+ * @version 0.2.0
  * @since 0.1.0
  */
 public class OverpassField
@@ -83,6 +83,12 @@ public class OverpassField
 			return this.maxLongLength;
 		}
 	};
+	/**
+	 * {@link OverpassField} of the name {@link Tag}
+	 *
+	 * @since 0.2.0
+	 */
+	public static final OverpassField NAME_FIELD       = new OverpassField("name");
 	
 	/**
 	 * the field name
