@@ -129,10 +129,12 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	 * @param name         the user friendly name
 	 * @param desc         the description show to the user
 	 * @param file         the {@link OsmFile} to get the features from
+	 * @throws FileNotFoundException if {@code file} doesn't exist
 	 * @since 0.2.0
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, OsmFile file) {
+	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, OsmFile file)
+	throws FileNotFoundException {
 		this(geometryType, id, name, desc, new FileFeatureStore(geometryType, file));
 	}
 	

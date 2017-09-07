@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -33,12 +34,16 @@ public class FileFeatureStore<G extends GeometryObject>
 	 *
 	 * @param type the {@link GeometryObject} type
 	 * @param file the {@link OsmFile} to get the features from
+	 * @throws FileNotFoundException if {@code file} doesn't exist
 	 * @since 0.2.0
 	 */
-	public FileFeatureStore(Class<G> type, OsmFile file) {
+	public FileFeatureStore(Class<G> type, OsmFile file)
+	throws FileNotFoundException {
 		super(type);
 		
 		this.file = file;
+		
+		this.loadFromFile();
 	}
 	
 	@Override
@@ -48,6 +53,17 @@ public class FileFeatureStore<G extends GeometryObject>
 			return;
 		}
 		
+		this.loadFromFile();
+	}
+	
+	/**
+	 * loads all features from {@code file}
+	 *
+	 * @throws FileNotFoundException if the {@link File} doesn't exist
+	 * @since 0.2.0
+	 */
+	private void loadFromFile()
+	throws FileNotFoundException {
 		@SuppressWarnings("unchecked")
 		Class<G> geometryType = (Class<G>) OverpassHandler.geometryClassFromEntity(this.getEntityType());
 		

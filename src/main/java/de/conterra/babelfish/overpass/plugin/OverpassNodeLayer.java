@@ -10,6 +10,7 @@ import de.conterra.babelfish.util.DataUtils;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
 import java.util.Set;
 
 /**
@@ -75,9 +76,11 @@ public class OverpassNodeLayer
 	 * @param desc  the description
 	 * @param file  the {@link OsmFile} to get the features from
 	 * @param image the {@link Image} with which the points will be rendered
+	 * @throws FileNotFoundException if {@code file} doesn't exist
 	 * @since 0.2.0
 	 */
-	public OverpassNodeLayer(int id, String name, String desc, OsmFile file, Image image) {
+	public OverpassNodeLayer(int id, String name, String desc, OsmFile file, Image image)
+	throws FileNotFoundException {
 		super(Point.class, id, name, desc, file);
 		
 		this.renderer = OverpassNodeLayer.createRenderer(name, image);

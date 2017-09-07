@@ -10,6 +10,7 @@ import de.conterra.babelfish.plugin.v10_02.object.symbol.style.SLSStyle;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
 import java.util.Set;
 
 /**
@@ -75,9 +76,11 @@ public class OverpassLineLayer
 	 * @param desc   the description
 	 * @param file   the {@link OsmFile} to get the features from
 	 * @param symbol the {@link SimpleLineSymbol} to render the {@link Way}s
+	 * @throws FileNotFoundException if {@code file} doesn't exist
 	 * @since 0.2.0
 	 */
-	public OverpassLineLayer(int id, String name, String desc, OsmFile file, SimpleLineSymbol symbol) {
+	public OverpassLineLayer(int id, String name, String desc, OsmFile file, SimpleLineSymbol symbol)
+	throws FileNotFoundException {
 		super(Polyline.class, id, name, desc, file);
 		
 		this.renderer = OverpassLineLayer.createRenderer(name, symbol);
