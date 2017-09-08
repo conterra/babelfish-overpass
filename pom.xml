@@ -30,13 +30,14 @@
 		
 		<lombok.version>1.16.18</lombok.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<babelfish.version>0.4.0-SNAPSHOT</babelfish.version>
-		<commonslang.version>3.6</commonslang.version>
-		<commonsio.version>2.5</commonsio.version>
 		<jodatime.version>2.9.9</jodatime.version>
+		<babelfish.version>0.4.0-SNAPSHOT</babelfish.version>
+		<commonsio.version>2.5</commonsio.version>
+		<commonslang.version>3.6</commonslang.version>
 		<osmosis.version>0.45</osmosis.version>
 		<junit.version>4.12</junit.version>
 		<mockito.version>2.8.47</mockito.version>
+		<log4j.version>2.8.2</log4j.version>
 		
 		<plugin.license.version>1.13</plugin.license.version>
 		<plugin.jaxb.version>0.13.2</plugin.jaxb.version>
@@ -111,6 +112,18 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>${mockito.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${log4j.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
