@@ -89,7 +89,7 @@
 				</xsd:attribute>
 				<xsd:attribute name="width" type="xsd:int" default="1">
 					<xsd:annotation>
-						<xsd:documentation>the with to render the line</xsd:documentation>
+						<xsd:documentation>the width to render the line</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attribute name="color" type="Color" default="#00DDFF">
@@ -286,22 +286,53 @@
 		<xsd:annotation>
 			<xsd:documentation>a features service to add to the Babelfish server</xsd:documentation>
 		</xsd:annotation>
-		<xsd:choice maxOccurs="unbounded">
-			<xsd:element name="nodeLayer" type="nodeLayerType">
-				<xsd:annotation>
-					<xsd:documentation>a layer with point features</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="lineLayer" type="lineLayerType">
-				<xsd:annotation>
-					<xsd:documentation>a layer with line features</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="polygonLayer" type="polygonLayerType">
-				<xsd:annotation>
-					<xsd:documentation>a layer with polygon features</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
+		<xsd:choice>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element name="nodeLayer" type="nodeLayerType">
+					<xsd:annotation>
+						<xsd:documentation>a layer with point features</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="lineLayer" type="lineLayerType">
+					<xsd:annotation>
+						<xsd:documentation>a layer with line features</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="polygonLayer" type="polygonLayerType">
+					<xsd:annotation>
+						<xsd:documentation>a layer with polygon features</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:sequence>
+				<xsd:element name="file" type="fileType">
+					<xsd:annotation>
+						<xsd:documentation>the file to use as the data source</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="categoryTag" type="xsd:string">
+					<xsd:annotation>
+						<xsd:documentation>the tag key, which is used to split the data in different layers</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:choice>
+					<xsd:element name="nodeLayer" type="nodeLayerType">
+						<xsd:annotation>
+							<xsd:documentation>a layer template with point features</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="lineLayer" type="lineLayerType">
+						<xsd:annotation>
+							<xsd:documentation>a layer template with line features</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="polygonLayer" type="polygonLayerType">
+						<xsd:annotation>
+							<xsd:documentation>a layer template with polygon features</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:sequence>
 		</xsd:choice>
 		<xsd:attribute name="id" type="xsd:string" use="required">
 			<xsd:annotation>

@@ -16,6 +16,7 @@ import de.conterra.babelfish.plugin.v10_02.object.symbol.style.SFSStyle;
 import de.conterra.babelfish.plugin.v10_02.object.symbol.style.SLSStyle;
 import de.conterra.babelfish.util.DataUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -122,7 +123,26 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	}
 	
 	/**
-	 * constructor, with given data {@link File}
+	 * constructor, with given {@link OsmFile} and filter parameters
+	 *
+	 * @param geometryType the {@link GeometryObject} type
+	 * @param id           the unique identifier
+	 * @param name         the user friendly name
+	 * @param desc         the description show to the user
+	 * @param file         the {@link OsmFile} to get the features from
+	 * @param typeKey      the {@link Tag} key to filter to
+	 * @param typeValues   the {@link Tag} values to filter to
+	 * @throws FileNotFoundException if {@code file} doesn't exist
+	 * @since 0.2.0
+	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues)
+	throws FileNotFoundException {
+		this(geometryType, id, name, desc, new FileFeatureStore(geometryType, file, typeKey, typeValues));
+	}
+	
+	/**
+	 * constructor, with given {@link OsmFile} to get the features from
 	 *
 	 * @param geometryType the {@link GeometryObject} type
 	 * @param id           the unique identifier
@@ -139,19 +159,68 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	}
 	
 	/**
-	 * parses a {@link LineSymbolType} to a {@link SimpleLineSymbol}
+	 * parses a {@link LineSymbolType} into a {@link SimpleLineSymbol}
 	 *
 	 * @param symbol the {@link LineSymbolType} to parse
 	 * @return the {@link SimpleLineSymbol} representation of {@code symbol}
 	 *
 	 * @since 0.1.0
 	 */
-	private static SimpleLineSymbol parseSymbol(LineSymbolType symbol) {
+	public static SimpleLineSymbol parseSymbol(LineSymbolType symbol) {
 		if (symbol == null) {
 			return null;
 		}
 		
 		return new SimpleLineSymbol(SLSStyle.valueOf(symbol.getStyle().value()), Color.decode(symbol.getColor()), symbol.getWidth());
+	}
+	
+	/**
+	 * parses a {@link FillSymbolType} into a {@link SimpleFillSymbol}
+	 *
+	 * @param symbol the {@link FillSymbolType} to parse
+	 * @return the {@link SimpleFillSymbol} representation of {@code symbol}
+	 *
+	 * @since 0.2.0
+	 */
+	public static SimpleFillSymbol parseSymbol(FillSymbolType symbol) {
+		SimpleFillSymbol sfs = null;
+		
+		if (symbol != null) {
+			sfs = new SimpleFillSymbol(SFSStyle.Solid, Color.decode(symbol.getColor()), OverpassFeatureLayer.parseSymbol(symbol.getOutline()));
+		}
+		
+		return sfs;
+	}
+	
+	/**
+	 * parses a {@link PictureSymbolType} into an {@link Image}
+	 *
+	 * @param symbol the {@link PictureSymbolType} to parse
+	 * @return the {@link Image} representation of {@code symbol}
+	 *
+	 * @since 0.2.0
+	 */
+	public static Image parseImage(PictureSymbolType symbol) {
+		Image image = null;
+		
+		if (symbol != null) {
+			try {
+				File imageFile = new File(OverpassPlugin.SERVICES_FOLDER, symbol.getPath());
+				
+				if (imageFile.exists()) {
+					image = ImageIO.read(imageFile);
+				}
+			} catch (NullPointerException | IOException e) {
+				log.debug("Symbol couldn't load from file: " + symbol.getPath(), e);
+			}
+			
+			String symbolData = symbol.getData();
+			if (image == null && symbolData != null && !(symbolData.isEmpty())) {
+				image = DataUtils.toImage(DataUtils.decodeBase64(symbolData));
+			}
+		}
+		
+		return image;
 	}
 	
 	/**
@@ -173,16 +242,7 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 		boolean  useFile  = !useScript && (fileInfo != null);
 		OsmFile  dataFile = null;
 		if (useFile) {
-			String filePath = fileInfo.getPath();
-			String errorMsg = "Couldn't load file from given path! (" + filePath + ")";
-			
-			File file = new File(OverpassPlugin.SERVICES_FOLDER, filePath);
-			
-			if (!(file.exists())) {
-				throw new IOException(errorMsg, new FileNotFoundException());
-			}
-			
-			dataFile = new OsmFile(file, fileInfo.getType(), fileInfo.getCompression());
+			dataFile = new OsmFile(fileInfo);
 		}
 		
 		if (layer instanceof NodeLayerType) {
@@ -190,25 +250,7 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 			
 			log.debug("Create a layer of nodes from " + nodeLayer.getName());
 			
-			Image             image  = null;
-			PictureSymbolType symbol = nodeLayer.getSymbol();
-			
-			if (symbol != null) {
-				try {
-					File imageFile = new File(OverpassPlugin.SERVICES_FOLDER, symbol.getPath());
-					
-					if (imageFile.exists()) {
-						image = ImageIO.read(imageFile);
-					}
-				} catch (NullPointerException | IOException e) {
-					log.debug("Symbol couldn't load from file: " + symbol.getPath(), e);
-				}
-				
-				String symbolData = symbol.getData();
-				if (image == null && symbolData != null && !(symbolData.isEmpty())) {
-					image = DataUtils.toImage(DataUtils.decodeBase64(symbolData));
-				}
-			}
+			Image image = OverpassFeatureLayer.parseImage(nodeLayer.getSymbol());
 			
 			if (useFile) {
 				return new OverpassNodeLayer(nodeLayer.getId(), nodeLayer.getName(), nodeLayer.getDesc(), dataFile, image);

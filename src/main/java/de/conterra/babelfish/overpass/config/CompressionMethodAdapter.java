@@ -11,7 +11,7 @@ import org.openstreetmap.osmosis.xml.common.CompressionMethod;
  */
 public class CompressionMethodAdapter {
 	/**
-	 * converts an {@link CompressionMethod} to a {@link String}
+	 * converts a {@link CompressionMethod} to a {@link String}
 	 *
 	 * @param impl the {@link CompressionMethod} to convert
 	 * @return the converted {@link CompressionMethod} as {@link String}

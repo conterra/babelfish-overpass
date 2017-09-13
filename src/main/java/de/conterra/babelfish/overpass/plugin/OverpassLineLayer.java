@@ -7,6 +7,7 @@ import de.conterra.babelfish.plugin.v10_02.object.renderer.RendererObject;
 import de.conterra.babelfish.plugin.v10_02.object.renderer.SimpleRenderer;
 import de.conterra.babelfish.plugin.v10_02.object.symbol.SimpleLineSymbol;
 import de.conterra.babelfish.plugin.v10_02.object.symbol.style.SLSStyle;
+import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
 import java.awt.*;
@@ -64,6 +65,26 @@ public class OverpassLineLayer
 	 */
 	public OverpassLineLayer(int id, String name, String desc, Set<? extends String> metaFilter, SimpleLineSymbol symbol) {
 		super(Polyline.class, id, name, desc, metaFilter);
+		
+		this.renderer = OverpassLineLayer.createRenderer(name, symbol);
+	}
+	
+	/**
+	 * constructor, with given {@link OsmFile} and filter parameters
+	 *
+	 * @param id         the unique identifier
+	 * @param name       the user-friendly name
+	 * @param desc       the description
+	 * @param file       the {@link OsmFile} to get the features from
+	 * @param typeKey    the {@link Tag} key to filter to
+	 * @param typeValues the {@link Tag} values to filter to
+	 * @param symbol     the {@link SimpleLineSymbol} to render the {@link Way}s
+	 * @throws FileNotFoundException if {@code file} doesn't exist
+	 * @since 0.2.0
+	 */
+	public OverpassLineLayer(int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues, SimpleLineSymbol symbol)
+	throws FileNotFoundException {
+		super(Polyline.class, id, name, desc, file, typeKey, typeValues);
 		
 		this.renderer = OverpassLineLayer.createRenderer(name, symbol);
 	}

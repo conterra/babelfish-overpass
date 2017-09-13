@@ -69,7 +69,25 @@ public class OverpassNodeLayer
 	}
 	
 	/**
-	 * constructor, with given {@link OsmFile}
+	 * constructor, with given {@link OsmFile} and filter parameters
+	 *
+	 * @param id    the unique identifier
+	 * @param name  the user-friendly name
+	 * @param desc  the description
+	 * @param file  the {@link OsmFile} to get the features from
+	 * @param image the {@link Image} with which the points will be rendered
+	 * @throws FileNotFoundException if {@code file} doesn't exist
+	 * @since 0.2.0
+	 */
+	public OverpassNodeLayer(int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues, Image image)
+	throws FileNotFoundException {
+		super(Point.class, id, name, desc, file, typeKey, typeValues);
+		
+		this.renderer = OverpassNodeLayer.createRenderer(name, image);
+	}
+	
+	/**
+	 * constructor, with given {@link OsmFile} to get the features from
 	 *
 	 * @param id    the unique identifier
 	 * @param name  the user-friendly name

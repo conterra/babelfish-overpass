@@ -8,6 +8,7 @@ import de.conterra.babelfish.plugin.v10_02.object.renderer.SimpleRenderer;
 import de.conterra.babelfish.plugin.v10_02.object.symbol.SimpleFillSymbol;
 import de.conterra.babelfish.plugin.v10_02.object.symbol.SimpleLineSymbol;
 import de.conterra.babelfish.plugin.v10_02.object.symbol.style.SFSStyle;
+import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
 import java.awt.*;
@@ -65,6 +66,26 @@ public class OverpassPolygonLayer
 	 */
 	public OverpassPolygonLayer(int id, String name, String desc, Set<? extends String> metaFilter, SimpleFillSymbol symbol) {
 		super(Polygon.class, id, name, desc, metaFilter);
+		
+		this.renderer = OverpassPolygonLayer.createRenderer(name, symbol);
+	}
+	
+	/**
+	 * constructor, with given {@link OsmFile} and filter parameters
+	 *
+	 * @param id         the unique identifier
+	 * @param name       the user-friendly name
+	 * @param desc       the description
+	 * @param file       the {@link OsmFile} to get the features from
+	 * @param typeKey    the {@link Tag} key to filter to
+	 * @param typeValues the {@link Tag} values to filter to
+	 * @param symbol     the {@link SimpleFillSymbol} to render the {@link Way}s
+	 * @throws FileNotFoundException if {@code file} doesn't exist
+	 * @since 0.2.0
+	 */
+	public OverpassPolygonLayer(int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues, SimpleFillSymbol symbol)
+	throws FileNotFoundException {
+		super(Polygon.class, id, name, desc, file, typeKey, typeValues);
 		
 		this.renderer = OverpassPolygonLayer.createRenderer(name, symbol);
 	}

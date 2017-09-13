@@ -48,7 +48,7 @@ public class FeatureConverter {
 	 *
 	 * @since 0.1.0
 	 */
-	public static <G extends GeometryObject> Map<? extends Long, ? extends Feature<? extends GeometryFeatureObject<G>>> convert(Class<G> clazz, Map<? extends Long, ? extends Entity> features) {
+	public static <G extends GeometryObject> Map<? extends Long, ? extends OverpassFeature<? extends GeometryFeatureObject<G>>> convert(Class<G> clazz, Map<? extends Long, ? extends Entity> features) {
 		Map<Long, Point>              points   = new LinkedHashMap<>();
 		Map<Long, Polyline>           lines    = new LinkedHashMap<>();
 		Map<Long, Map<Field, Object>> metas    = new LinkedHashMap<>();
@@ -135,7 +135,7 @@ public class FeatureConverter {
 			metas.put(id, metaFields);
 		}
 		
-		LinkedHashMap<Long, Feature<GeometryFeatureObject<G>>> res = new LinkedHashMap<>();
+		LinkedHashMap<Long, OverpassFeature<GeometryFeatureObject<G>>> res = new LinkedHashMap<>();
 		
 		if (Polyline.class.isAssignableFrom(clazz)) {
 			log.debug("Return all ways. (" + lines.size() + ")");

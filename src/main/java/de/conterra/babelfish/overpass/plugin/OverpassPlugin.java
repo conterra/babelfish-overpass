@@ -13,6 +13,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 
 /**
@@ -77,7 +78,7 @@ public class OverpassPlugin
 								res = false;
 							}
 						}
-					} catch (JAXBException | ClassCastException e) {
+					} catch (JAXBException | ClassCastException | FileNotFoundException e) {
 						String msg = "Could not load a valid Overpass configuration from: " + file.getName();
 						log.warn(msg, e);
 					}

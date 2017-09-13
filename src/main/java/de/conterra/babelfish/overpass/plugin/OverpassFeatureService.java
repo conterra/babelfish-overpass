@@ -1,17 +1,22 @@
 package de.conterra.babelfish.overpass.plugin;
 
-import de.conterra.babelfish.overpass.config.LayerType;
-import de.conterra.babelfish.overpass.config.ServiceType;
+import de.conterra.babelfish.overpass.config.*;
+import de.conterra.babelfish.overpass.io.OsmFile;
+import de.conterra.babelfish.overpass.io.OverpassHandler;
 import de.conterra.babelfish.plugin.Plugin;
 import de.conterra.babelfish.plugin.v10_02.feature.*;
 import de.conterra.babelfish.plugin.v10_02.object.feature.FeatureObject;
 import de.conterra.babelfish.plugin.v10_02.object.feature.GeometryFeatureObject;
 import de.conterra.babelfish.util.DataUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
+import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 /**
  * defines a {@link FeatureService} of the Overpass API
@@ -69,14 +74,90 @@ public class OverpassFeatureService
 	 * @param service the {@link ServiceType}
 	 * @since 0.1.0
 	 */
-	public OverpassFeatureService(ServiceType service) {
+	public OverpassFeatureService(ServiceType service)
+	throws FileNotFoundException {
 		this(service.getId(), service.getDesc());
 		
-		for (LayerType xmlLayer : service.getNodeLayerOrLineLayerOrPolygonLayer()) {
+		FileType fileType = service.getFile();
+		if (fileType == null) {
+			for (LayerType xmlLayer : service.getNodeLayerOrLineLayerOrPolygonLayer()) {
+				try {
+					this.addLayer(OverpassFeatureLayer.createLayer(xmlLayer));
+				} catch (IOException | IllegalArgumentException e) {
+					log.warn("Couldn't add layer " + xmlLayer.getName() + "! Failure on parsing!", e);
+				}
+			}
+		} else {
+			OsmFile     file          = new OsmFile(fileType);
+			String      categoryTag   = service.getCategoryTag();
+			Set<String> typeValuesSet = new HashSet<>();
+			
+			for (Entity entity : OverpassHandler.getFeatures(new OsmFile(fileType)).values()) {
+				for (Tag tag : entity.getTags()) {
+					if (tag.getKey().equals(categoryTag)) {
+						typeValuesSet.add(tag.getValue());
+						break;
+					}
+				}
+			}
+			
+			List<String> typeValuesList = new LinkedList<>(typeValuesSet);
+			Collections.sort(typeValuesList);
+			
 			try {
-				this.addLayer(OverpassFeatureLayer.createLayer(xmlLayer));
-			} catch (IOException | IllegalArgumentException e) {
-				log.warn("Couldn't add layer " + xmlLayer.getName() + "! Failure on parsing!", e);
+				int       i        = 0;
+				LayerType xmlLayer = service.getNodeLayerOrLineLayerOrPolygonLayer().get(0);
+				
+				for (String typeValue : typeValuesList) {
+					Set<String> typeValueSet = new HashSet<>();
+					typeValueSet.add(typeValue);
+					String desc = categoryTag + "=" + typeValue;
+					
+					OverpassFeatureLayer<?> featureLayer;
+					
+					if (xmlLayer instanceof NodeLayerType) {
+						NodeLayerType nodeLayer = (NodeLayerType) xmlLayer;
+						featureLayer = new OverpassNodeLayer(
+								i,
+								typeValue,
+								desc,
+								file,
+								categoryTag,
+								typeValueSet,
+								OverpassFeatureLayer.parseImage(nodeLayer.getSymbol())
+						);
+					} else if (xmlLayer instanceof LineLayerType) {
+						LineLayerType lineLayer = (LineLayerType) xmlLayer;
+						featureLayer = new OverpassLineLayer(
+								i,
+								typeValue,
+								desc,
+								file,
+								categoryTag,
+								typeValueSet,
+								OverpassFeatureLayer.parseSymbol(lineLayer.getSymbol())
+						);
+					} else if (xmlLayer instanceof PolygonLayerType) {
+						PolygonLayerType polygonLayer = (PolygonLayerType) xmlLayer;
+						featureLayer = new OverpassPolygonLayer(
+								i,
+								typeValue,
+								desc,
+								file,
+								categoryTag,
+								typeValueSet,
+								OverpassFeatureLayer.parseSymbol(polygonLayer.getSymbol())
+						);
+					} else {
+						continue;
+					}
+					
+					this.addLayer(featureLayer);
+					
+					i++;
+				}
+			} catch (IOException | ClassCastException e) {
+				log.error("Failure on parsing layer template!", e);
 			}
 		}
 	}
