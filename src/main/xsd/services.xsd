@@ -18,11 +18,31 @@
 			<xsd:documentation>the style to render a polyline</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="Null" />
-			<xsd:enumeration value="Dot" />
-			<xsd:enumeration value="DashDotDot" />
-			<xsd:enumeration value="Dash" />
-			<xsd:enumeration value="Solid" />
+			<xsd:enumeration value="Null">
+				<xsd:annotation>
+					<xsd:documentation>no visible line</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Dot">
+				<xsd:annotation>
+					<xsd:documentation>a dotted line</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DashDotDot">
+				<xsd:annotation>
+					<xsd:documentation>a line, which will drawn with a dash-dot-dot signature</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Dash">
+				<xsd:annotation>
+					<xsd:documentation>a dashed line</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Solid">
+				<xsd:annotation>
+					<xsd:documentation>a solid line</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
 	
@@ -160,8 +180,16 @@
 					<xsd:documentation>a path to the data file, relative to the services folder.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="type" type="fileFormatType" />
-			<xsd:element name="compression" type="compressionType" />
+			<xsd:element name="type" type="fileFormatType">
+				<xsd:annotation>
+					<xsd:documentation>the file format, in which the OpenStreetMap data will be stored.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="compression" type="compressionType">
+				<xsd:annotation>
+					<xsd:documentation>the compression type</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	
@@ -180,7 +208,11 @@
 					<xsd:documentation>a complete Overpass script to filter the data. Must contain one or more {{bbox}} as placeholder of the requested bounding box.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="file" type="fileType" minOccurs="0" />
+			<xsd:element name="file" type="fileType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>file with the OpenStreetMap data, to use as the data source.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:choice>
 		<xsd:attribute name="id" type="xsd:int" use="required">
 			<xsd:annotation>
@@ -255,9 +287,21 @@
 			<xsd:documentation>a features service to add to the Babelfish server</xsd:documentation>
 		</xsd:annotation>
 		<xsd:choice maxOccurs="unbounded">
-			<xsd:element name="nodeLayer" type="nodeLayerType" />
-			<xsd:element name="lineLayer" type="lineLayerType" />
-			<xsd:element name="polygonLayer" type="polygonLayerType" />
+			<xsd:element name="nodeLayer" type="nodeLayerType">
+				<xsd:annotation>
+					<xsd:documentation>a layer with point features</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="lineLayer" type="lineLayerType">
+				<xsd:annotation>
+					<xsd:documentation>a layer with line features</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="polygonLayer" type="polygonLayerType">
+				<xsd:annotation>
+					<xsd:documentation>a layer with polygon features</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:choice>
 		<xsd:attribute name="id" type="xsd:string" use="required">
 			<xsd:annotation>
@@ -274,7 +318,11 @@
 	<xsd:element name="services">
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element name="service" type="serviceType" maxOccurs="unbounded" />
+				<xsd:element name="service" type="serviceType" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation>a features service</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
