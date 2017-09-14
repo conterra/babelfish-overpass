@@ -182,11 +182,16 @@ public abstract class FeatureStore<G extends GeometryObject> {
 		try {
 			this.request(spatialFilter);
 		} catch (IOException e) {
+			log.warn("Unable to request features from store!", e);
 		}
 		
 		Map<? extends Long, ? extends Feature<? extends GeometryFeatureObject<G>>> allFeatures = this.getFeatures();
-		Map<Long, Feature<? extends GeometryFeatureObject<G>>>                     result      = new HashMap<>();
 		
+		if (spatialFilter == null) {
+			return allFeatures;
+		}
+		
+		Map<Long, Feature<? extends GeometryFeatureObject<G>>> result = new HashMap<>();
 		for (long id : allFeatures.keySet()) {
 			Feature<? extends GeometryFeatureObject<G>> feature = allFeatures.get(id);
 			
