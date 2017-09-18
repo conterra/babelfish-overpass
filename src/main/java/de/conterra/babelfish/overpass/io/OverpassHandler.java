@@ -1,7 +1,7 @@
 package de.conterra.babelfish.overpass.io;
 
 import crosby.binary.osmosis.OsmosisReader;
-import de.conterra.babelfish.overpass.OverpassConfigStore;
+import de.conterra.babelfish.overpass.config.OverpassConfigStore;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.*;
 import de.conterra.babelfish.util.GeoUtils;
 import lombok.extern.slf4j.Slf4j;

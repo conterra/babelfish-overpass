@@ -4,7 +4,10 @@ import de.conterra.babelfish.overpass.config.*;
 import de.conterra.babelfish.overpass.io.OsmFile;
 import de.conterra.babelfish.overpass.io.OverpassHandler;
 import de.conterra.babelfish.plugin.Plugin;
-import de.conterra.babelfish.plugin.v10_02.feature.*;
+import de.conterra.babelfish.plugin.v10_02.feature.FeatureLayer;
+import de.conterra.babelfish.plugin.v10_02.feature.FeatureService;
+import de.conterra.babelfish.plugin.v10_02.feature.Relationship;
+import de.conterra.babelfish.plugin.v10_02.feature.Table;
 import de.conterra.babelfish.plugin.v10_02.object.feature.FeatureObject;
 import de.conterra.babelfish.plugin.v10_02.object.feature.GeometryFeatureObject;
 import de.conterra.babelfish.util.DataUtils;
@@ -69,18 +72,18 @@ public class OverpassFeatureService
 	}
 	
 	/**
-	 * constructor, with given {@link ServiceType}
+	 * constructor, with given {@link Service}
 	 *
-	 * @param service the {@link ServiceType}
+	 * @param service the {@link Service}
 	 * @since 0.1.0
 	 */
-	public OverpassFeatureService(ServiceType service)
+	public OverpassFeatureService(Service service)
 	throws FileNotFoundException {
 		this(service.getId(), service.getDesc());
 		
-		FileType fileType = service.getFile();
+		OsmFileDef fileType = service.getFile();
 		if (fileType == null) {
-			for (LayerType xmlLayer : service.getNodeLayerOrLineLayerOrPolygonLayer()) {
+			for (Layer xmlLayer : service.getNodeLayerOrLineLayerOrPolygonLayer()) {
 				try {
 					this.addLayer(OverpassFeatureLayer.createLayer(xmlLayer));
 				} catch (IOException | IllegalArgumentException e) {
@@ -104,62 +107,111 @@ public class OverpassFeatureService
 			List<String> typeValuesList = new LinkedList<>(typeValuesSet);
 			Collections.sort(typeValuesList);
 			
-			try {
-				int       i        = 0;
-				LayerType xmlLayer = service.getNodeLayerOrLineLayerOrPolygonLayer().get(0);
-				
+			Map<String, String> properties = new HashMap<>();
+			properties.put("category.key", categoryTag);
+			
+			for (LayerTemplate template : service.getNodeLayerTemplateOrLineLayerTemplateOrPolygonLayerTemplate()) {
 				for (String typeValue : typeValuesList) {
-					Set<String> typeValueSet = new HashSet<>();
-					typeValueSet.add(typeValue);
-					String desc = categoryTag + "=" + typeValue;
-					
-					OverpassFeatureLayer<?> featureLayer;
-					
-					if (xmlLayer instanceof NodeLayerType) {
-						NodeLayerType nodeLayer = (NodeLayerType) xmlLayer;
-						featureLayer = new OverpassNodeLayer(
-								i,
-								typeValue,
-								desc,
-								file,
-								categoryTag,
-								typeValueSet,
-								OverpassFeatureLayer.parseImage(nodeLayer.getSymbol())
-						);
-					} else if (xmlLayer instanceof LineLayerType) {
-						LineLayerType lineLayer = (LineLayerType) xmlLayer;
-						featureLayer = new OverpassLineLayer(
-								i,
-								typeValue,
-								desc,
-								file,
-								categoryTag,
-								typeValueSet,
-								OverpassFeatureLayer.parseSymbol(lineLayer.getSymbol())
-						);
-					} else if (xmlLayer instanceof PolygonLayerType) {
-						PolygonLayerType polygonLayer = (PolygonLayerType) xmlLayer;
-						featureLayer = new OverpassPolygonLayer(
-								i,
-								typeValue,
-								desc,
-								file,
-								categoryTag,
-								typeValueSet,
-								OverpassFeatureLayer.parseSymbol(polygonLayer.getSymbol())
-						);
-					} else {
-						continue;
+					try {
+						int layerId = this.getLayers().size();
+						
+						properties.put("layerId", String.valueOf(layerId));
+						properties.put("category.value", typeValue);
+						
+						Set<String> typeValueSet = new HashSet<>();
+						typeValueSet.add(typeValue);
+						
+						String name = OverpassFeatureService.replaceProperties(template.getName(), properties);
+						String desc = OverpassFeatureService.replaceProperties(template.getDesc(), properties);
+						
+						OverpassFeatureLayer<?> featureLayer;
+						
+						if (template instanceof NodeLayerTemplate) {
+							NodeLayerTemplate nodeTemplate = (NodeLayerTemplate) template;
+							
+							PictureSymbol symbol = nodeTemplate.getSymbol();
+							if (symbol != null) {
+								String imgPath = symbol.getPath();
+								if (imgPath != null) {
+									symbol = OverpassPlugin.OBJECT_FACTORY.createPictureSymbol();
+									symbol.setPath(OverpassFeatureService.replaceProperties(imgPath, properties));
+								}
+							}
+							Image image = OverpassFeatureLayer.parseImage(symbol);
+							if (image == null) {
+								symbol = nodeTemplate.getDefaultSymbol();
+								String imgPath = symbol.getPath();
+								if (imgPath != null) {
+									symbol = OverpassPlugin.OBJECT_FACTORY.createPictureSymbol();
+									symbol.setPath(OverpassFeatureService.replaceProperties(imgPath, properties));
+								}
+								
+								OverpassFeatureLayer.parseImage(symbol);
+							}
+							
+							featureLayer = new OverpassNodeLayer(
+									layerId,
+									name,
+									desc,
+									file,
+									categoryTag,
+									typeValueSet,
+									image
+							);
+						} else if (template instanceof LineLayerTemplate) {
+							LineLayerTemplate lineTemplate = (LineLayerTemplate) template;
+							featureLayer = new OverpassLineLayer(
+									layerId,
+									name,
+									desc,
+									file,
+									categoryTag,
+									typeValueSet,
+									OverpassFeatureLayer.parseSymbol(lineTemplate.getDefaultSymbol())
+							);
+						} else if (template instanceof PolygonLayerTemplate) {
+							PolygonLayerTemplate polygonTemplate = (PolygonLayerTemplate) template;
+							featureLayer = new OverpassPolygonLayer(
+									layerId,
+									name,
+									desc,
+									file,
+									categoryTag,
+									typeValueSet,
+									OverpassFeatureLayer.parseSymbol(polygonTemplate.getDefaultSymbol())
+							);
+						} else {
+							continue;
+						}
+						
+						this.addLayer(featureLayer);
+					} catch (IOException | ClassCastException e) {
+						log.error("Failure on parsing layer template!", e);
 					}
-					
-					this.addLayer(featureLayer);
-					
-					i++;
 				}
-			} catch (IOException | ClassCastException e) {
-				log.error("Failure on parsing layer template!", e);
 			}
 		}
+	}
+	
+	/**
+	 * replaces all properties with their values on a {@link String}
+	 *
+	 * @param str        the {@link String} to replace the properties in
+	 * @param properties a {@link Map}, which contains the properties (keys) with their values (values)
+	 * @return {@code str} with all resolved properties
+	 *
+	 * @since 0.2.0
+	 */
+	private static String replaceProperties(String str, Map<String, String> properties) {
+		String res = str;
+		
+		if (res != null) {
+			for (String property : properties.keySet()) {
+				res = res.replaceAll("\\$\\{" + property + "}", properties.get(property));
+			}
+		}
+		
+		return res;
 	}
 	
 	@Override
@@ -183,8 +235,8 @@ public class OverpassFeatureService
 	}
 	
 	@Override
-	public Set<? extends Layer<? extends FeatureObject>> getLayers() {
-		Set<Layer<? extends FeatureObject>> res = new LinkedHashSet<>();
+	public Set<? extends de.conterra.babelfish.plugin.v10_02.feature.Layer<? extends FeatureObject>> getLayers() {
+		Set<de.conterra.babelfish.plugin.v10_02.feature.Layer<? extends FeatureObject>> res = new LinkedHashSet<>();
 		
 		res.addAll(this.getFeatureLayers());
 		res.addAll(this.getTables());

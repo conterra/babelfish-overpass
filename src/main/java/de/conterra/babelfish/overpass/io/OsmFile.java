@@ -1,6 +1,6 @@
 package de.conterra.babelfish.overpass.io;
 
-import de.conterra.babelfish.overpass.config.FileType;
+import de.conterra.babelfish.overpass.config.OsmFileDef;
 import de.conterra.babelfish.overpass.plugin.OverpassPlugin;
 import lombok.Getter;
 import org.openstreetmap.osmosis.xml.common.CompressionMethod;
@@ -53,12 +53,12 @@ public class OsmFile {
 	}
 	
 	/**
-	 * constructor, created from {@link FileType}
+	 * constructor, created from {@link OsmFileDef}
 	 *
-	 * @param xmlFileType the {@link FileType} to get the information from
+	 * @param xmlFileType the {@link OsmFileDef} to get the information from
 	 * @throws FileNotFoundException if the file path is not set or the {@link File} couldn't found under the given path
 	 */
-	public OsmFile(FileType xmlFileType)
+	public OsmFile(OsmFileDef xmlFileType)
 	throws FileNotFoundException {
 		String filePath = xmlFileType.getPath();
 		File   file     = new File(OverpassPlugin.SERVICES_FOLDER, xmlFileType.getPath());

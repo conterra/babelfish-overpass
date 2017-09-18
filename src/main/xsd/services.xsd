@@ -13,7 +13,7 @@
 		</xsd:union>
 	</xsd:simpleType>
 	
-	<xsd:simpleType name="lineStyleType">
+	<xsd:simpleType name="lineStyle">
 		<xsd:annotation>
 			<xsd:documentation>the style to render a polyline</xsd:documentation>
 		</xsd:annotation>
@@ -46,18 +46,18 @@
 		</xsd:restriction>
 	</xsd:simpleType>
 	
-	<xsd:complexType name="symbolType" abstract="true">
+	<xsd:complexType name="symbol" abstract="true">
 		<xsd:annotation>
 			<xsd:documentation>a signature definition to render features</xsd:documentation>
 		</xsd:annotation>
 	</xsd:complexType>
 	
-	<xsd:complexType name="pictureSymbolType">
+	<xsd:complexType name="pictureSymbol">
 		<xsd:annotation>
 			<xsd:documentation>a symbol of a point</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="symbolType">
+			<xsd:extension base="symbol">
 				<xsd:sequence>
 					<xsd:choice>
 						<xsd:element name="data" type="xsd:string">
@@ -76,13 +76,13 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	
-	<xsd:complexType name="lineSymbolType">
+	<xsd:complexType name="lineSymbol">
 		<xsd:annotation>
 			<xsd:documentation>a line signature</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="symbolType">
-				<xsd:attribute name="style" type="lineStyleType" default="Solid">
+			<xsd:extension base="symbol">
+				<xsd:attribute name="style" type="lineStyle" default="Solid">
 					<xsd:annotation>
 						<xsd:documentation>the style of the line</xsd:documentation>
 					</xsd:annotation>
@@ -101,14 +101,14 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	
-	<xsd:complexType name="fillSymbolType">
+	<xsd:complexType name="fillSymbol">
 		<xsd:annotation>
 			<xsd:documentation>a symbol to fill polygons</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="symbolType">
+			<xsd:extension base="symbol">
 				<xsd:sequence>
-					<xsd:element name="outline" type="lineSymbolType" minOccurs="0">
+					<xsd:element name="outline" type="lineSymbol" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation>the signature, how to render the outline of the polygon</xsd:documentation>
 						</xsd:annotation>
@@ -123,9 +123,9 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	
-	<xsd:simpleType name="fileFormatType" final="restriction">
+	<xsd:simpleType name="fileFormat" final="restriction">
 		<xsd:annotation>
-			<xsd:documentation>the type of an OSM data file.</xsd:documentation>
+			<xsd:documentation>the type of an OSM data file</xsd:documentation>
 			<xsd:appinfo>
 				<jaxb:javaType name="de.conterra.babelfish.overpass.io.OsmFileFormat" parseMethod="de.conterra.babelfish.overpass.io.OsmFileFormat.valueOf" printMethod="OsmFileFormatAdapter.printEnumToString" />
 			</xsd:appinfo>
@@ -144,9 +144,9 @@
 		</xsd:restriction>
 	</xsd:simpleType>
 	
-	<xsd:simpleType name="compressionType" final="restriction">
+	<xsd:simpleType name="compression" final="restriction">
 		<xsd:annotation>
-			<xsd:documentation>the compression of an OSM data file.</xsd:documentation>
+			<xsd:documentation>the compression of an OSM data file</xsd:documentation>
 			<xsd:appinfo>
 				<jaxb:javaType name="org.openstreetmap.osmosis.xml.common.CompressionMethod" parseMethod="org.openstreetmap.osmosis.xml.common.CompressionMethod.valueOf" printMethod="CompressionMethodAdapter.printEnumToString" />
 			</xsd:appinfo>
@@ -170,22 +170,22 @@
 		</xsd:restriction>
 	</xsd:simpleType>
 	
-	<xsd:complexType name="fileType">
+	<xsd:complexType name="osmFileDef">
 		<xsd:annotation>
 			<xsd:documentation>a file, which contains OpenStreetMap features</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="path" type="xsd:string">
 				<xsd:annotation>
-					<xsd:documentation>a path to the data file, relative to the services folder.</xsd:documentation>
+					<xsd:documentation>a path to the data file, relative to the services folder</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="type" type="fileFormatType">
+			<xsd:element name="type" type="fileFormat">
 				<xsd:annotation>
-					<xsd:documentation>the file format, in which the OpenStreetMap data will be stored.</xsd:documentation>
+					<xsd:documentation>the file format, in which the OpenStreetMap data will be stored</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="compression" type="compressionType">
+			<xsd:element name="compression" type="compression">
 				<xsd:annotation>
 					<xsd:documentation>the compression type</xsd:documentation>
 				</xsd:annotation>
@@ -193,32 +193,17 @@
 		</xsd:sequence>
 	</xsd:complexType>
 	
-	<xsd:complexType name="layerType" abstract="true">
+	<xsd:complexType name="layerTemplate">
 		<xsd:annotation>
-			<xsd:documentation>a layer to provide OpenStreetMap features on a Babelfish server</xsd:documentation>
+			<xsd:documentation>a template of layers
+				<br />The following properties could used in text attributes and elements like names or descriptions:
+				<ul>
+					<li>${layerId}</li>
+					<li>${category.key}</li>
+					<li>${category.value}</li>
+				</ul>
+			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:choice>
-			<xsd:element name="metaFilter" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
-				<xsd:annotation>
-					<xsd:documentation>filter of the OpenStreetMap tags</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="script" type="xsd:string" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>a complete Overpass script to filter the data. Must contain one or more {{bbox}} as placeholder of the requested bounding box.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="file" type="fileType" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>file with the OpenStreetMap data, to use as the data source.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-		</xsd:choice>
-		<xsd:attribute name="id" type="xsd:int" use="required">
-			<xsd:annotation>
-				<xsd:documentation>the unique identifier</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
 		<xsd:attribute name="name" type="xsd:string" use="required">
 			<xsd:annotation>
 				<xsd:documentation>an user-friendly name</xsd:documentation>
@@ -231,14 +216,106 @@
 		</xsd:attribute>
 	</xsd:complexType>
 	
-	<xsd:complexType name="nodeLayerType">
+	<xsd:complexType name="nodeLayerTemplate">
+		<xsd:annotation>
+			<xsd:documentation>a template of a layer, which contains OpenStreetMap nodes</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="layerTemplate">
+				<xsd:sequence>
+					<xsd:element name="defaultSymbol" type="pictureSymbol">
+						<xsd:annotation>
+							<xsd:documentation>a signature, used if no symbol could found for a layer</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="symbol" type="pictureSymbol" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>a signature to render the points
+								<br />Use properties in the path element to get different symbols of different layers.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:complexType name="lineLayerTemplate">
+		<xsd:annotation>
+			<xsd:documentation>a template of a layer, which contains OpenStreetMap ways</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="layerTemplate">
+				<xsd:sequence>
+					<xsd:element name="defaultSymbol" type="lineSymbol">
+						<xsd:annotation>
+							<xsd:documentation>a signature, used if no symbol could found for a layer</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<!-- TODO add variable symbols, by using color shift -->
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:complexType name="polygonLayerTemplate">
+		<xsd:annotation>
+			<xsd:documentation>a template of a layer, which contains closed OpenStreetMap ways or relations</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="layerTemplate">
+				<xsd:sequence>
+					<xsd:element name="defaultSymbol" type="fillSymbol">
+						<xsd:annotation>
+							<xsd:documentation>a signature, used if no symbol could found for a layer</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<!-- TODO add variable symbols, by using color shift -->
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:complexType name="layer" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>a layer to provide OpenStreetMap features on a Babelfish server</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="layerTemplate">
+				<xsd:choice>
+					<xsd:element name="metaFilter" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>filter of the OpenStreetMap tags</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="script" type="xsd:string" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>a complete Overpass script to filter the data. Must contain one or more {{bbox}} as placeholder of the requested bounding box.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="file" type="osmFileDef" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>file with the OpenStreetMap data, to use as the data source</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+				<xsd:attribute name="id" type="xsd:int" use="required">
+					<xsd:annotation>
+						<xsd:documentation>the unique identifier</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:complexType name="nodeLayer">
 		<xsd:annotation>
 			<xsd:documentation>a layer, which shows OpenStreetMap nodes as points</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="layerType">
+			<xsd:extension base="layer">
 				<xsd:sequence>
-					<xsd:element name="symbol" type="pictureSymbolType" minOccurs="0">
+					<xsd:element name="symbol" type="pictureSymbol" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation>a signature to render the points</xsd:documentation>
 						</xsd:annotation>
@@ -248,14 +325,14 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	
-	<xsd:complexType name="lineLayerType">
+	<xsd:complexType name="lineLayer">
 		<xsd:annotation>
 			<xsd:documentation>a layer, which shows OpenStreetMap ways as polylines</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="layerType">
+			<xsd:extension base="layer">
 				<xsd:sequence>
-					<xsd:element name="symbol" type="lineSymbolType" minOccurs="0">
+					<xsd:element name="symbol" type="lineSymbol" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation>a signature, how to render the lines</xsd:documentation>
 						</xsd:annotation>
@@ -265,14 +342,14 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	
-	<xsd:complexType name="polygonLayerType">
+	<xsd:complexType name="polygonLayer">
 		<xsd:annotation>
 			<xsd:documentation>a layer, which shows OpenStreetMap ways as polygons</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="layerType">
+			<xsd:extension base="layer">
 				<xsd:sequence>
-					<xsd:element name="symbol" type="fillSymbolType" minOccurs="0">
+					<xsd:element name="symbol" type="fillSymbol" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation>a signature to render the polygons</xsd:documentation>
 						</xsd:annotation>
@@ -282,30 +359,30 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	
-	<xsd:complexType name="serviceType">
+	<xsd:complexType name="service">
 		<xsd:annotation>
 			<xsd:documentation>a features service to add to the Babelfish server</xsd:documentation>
 		</xsd:annotation>
 		<xsd:choice>
 			<xsd:choice maxOccurs="unbounded">
-				<xsd:element name="nodeLayer" type="nodeLayerType">
+				<xsd:element name="nodeLayer" type="nodeLayer">
 					<xsd:annotation>
 						<xsd:documentation>a layer with point features</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
-				<xsd:element name="lineLayer" type="lineLayerType">
+				<xsd:element name="lineLayer" type="lineLayer">
 					<xsd:annotation>
 						<xsd:documentation>a layer with line features</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
-				<xsd:element name="polygonLayer" type="polygonLayerType">
+				<xsd:element name="polygonLayer" type="polygonLayer">
 					<xsd:annotation>
 						<xsd:documentation>a layer with polygon features</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
 			</xsd:choice>
 			<xsd:sequence>
-				<xsd:element name="file" type="fileType">
+				<xsd:element name="file" type="osmFileDef">
 					<xsd:annotation>
 						<xsd:documentation>the file to use as the data source</xsd:documentation>
 					</xsd:annotation>
@@ -315,18 +392,18 @@
 						<xsd:documentation>the tag key, which is used to split the data in different layers</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
-				<xsd:choice>
-					<xsd:element name="nodeLayer" type="nodeLayerType">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="nodeLayerTemplate" type="nodeLayerTemplate">
 						<xsd:annotation>
 							<xsd:documentation>a layer template with point features</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element name="lineLayer" type="lineLayerType">
+					<xsd:element name="lineLayerTemplate" type="lineLayerTemplate">
 						<xsd:annotation>
-							<xsd:documentation>a layer template with line features</xsd:documentation>
+							<xsd:documentation>a layer template with polyline features</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element name="polygonLayer" type="polygonLayerType">
+					<xsd:element name="polygonLayerTemplate" type="polygonLayerTemplate">
 						<xsd:annotation>
 							<xsd:documentation>a layer template with polygon features</xsd:documentation>
 						</xsd:annotation>
@@ -349,7 +426,7 @@
 	<xsd:element name="services">
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element name="service" type="serviceType" maxOccurs="unbounded">
+				<xsd:element name="service" type="service" maxOccurs="unbounded">
 					<xsd:annotation>
 						<xsd:documentation>a features service</xsd:documentation>
 					</xsd:annotation>

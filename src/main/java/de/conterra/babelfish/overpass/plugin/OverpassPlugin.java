@@ -1,6 +1,7 @@
 package de.conterra.babelfish.overpass.plugin;
 
-import de.conterra.babelfish.overpass.config.ServiceType;
+import de.conterra.babelfish.overpass.config.ObjectFactory;
+import de.conterra.babelfish.overpass.config.Service;
 import de.conterra.babelfish.overpass.config.Services;
 import de.conterra.babelfish.overpass.store.FeatureStore;
 import de.conterra.babelfish.overpass.store.PopupStore;
@@ -33,6 +34,12 @@ public class OverpassPlugin
 	 * @since 0.1.0
 	 */
 	public static final OverpassPlugin INSTANCE        = new OverpassPlugin();
+	/**
+	 * an {@link ObjectFactory} to create new XML instances
+	 *
+	 * @since 0.2.0
+	 */
+	public static final ObjectFactory  OBJECT_FACTORY  = new ObjectFactory();
 	/**
 	 * the services directory, where all configuration and data {@link File}s are stored
 	 *
@@ -73,7 +80,7 @@ public class OverpassPlugin
 					try {
 						Services services = (Services) (unmarshaller.unmarshal(file));
 						
-						for (ServiceType xmlService : services.getService()) {
+						for (Service xmlService : services.getService()) {
 							if (!(ServiceContainer.registerService(new OverpassFeatureService(xmlService)))) {
 								res = false;
 							}

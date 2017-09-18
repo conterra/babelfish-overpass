@@ -1,6 +1,7 @@
 package de.conterra.babelfish.overpass.plugin;
 
 import de.conterra.babelfish.overpass.config.*;
+import de.conterra.babelfish.overpass.config.Layer;
 import de.conterra.babelfish.overpass.io.OsmFile;
 import de.conterra.babelfish.overpass.store.FeatureStore;
 import de.conterra.babelfish.overpass.store.FileFeatureStore;
@@ -159,14 +160,14 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	}
 	
 	/**
-	 * parses a {@link LineSymbolType} into a {@link SimpleLineSymbol}
+	 * parses a {@link LineSymbol} into a {@link SimpleLineSymbol}
 	 *
-	 * @param symbol the {@link LineSymbolType} to parse
+	 * @param symbol the {@link LineSymbol} to parse
 	 * @return the {@link SimpleLineSymbol} representation of {@code symbol}
 	 *
 	 * @since 0.1.0
 	 */
-	public static SimpleLineSymbol parseSymbol(LineSymbolType symbol) {
+	public static SimpleLineSymbol parseSymbol(LineSymbol symbol) {
 		if (symbol == null) {
 			return null;
 		}
@@ -175,14 +176,14 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	}
 	
 	/**
-	 * parses a {@link FillSymbolType} into a {@link SimpleFillSymbol}
+	 * parses a {@link FillSymbol} into a {@link SimpleFillSymbol}
 	 *
-	 * @param symbol the {@link FillSymbolType} to parse
+	 * @param symbol the {@link FillSymbol} to parse
 	 * @return the {@link SimpleFillSymbol} representation of {@code symbol}
 	 *
 	 * @since 0.2.0
 	 */
-	public static SimpleFillSymbol parseSymbol(FillSymbolType symbol) {
+	public static SimpleFillSymbol parseSymbol(FillSymbol symbol) {
 		SimpleFillSymbol sfs = null;
 		
 		if (symbol != null) {
@@ -193,14 +194,14 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	}
 	
 	/**
-	 * parses a {@link PictureSymbolType} into an {@link Image}
+	 * parses a {@link PictureSymbol} into an {@link Image}
 	 *
-	 * @param symbol the {@link PictureSymbolType} to parse
+	 * @param symbol the {@link PictureSymbol} to parse
 	 * @return the {@link Image} representation of {@code symbol}
 	 *
 	 * @since 0.2.0
 	 */
-	public static Image parseImage(PictureSymbolType symbol) {
+	public static Image parseImage(PictureSymbol symbol) {
 		Image image = null;
 		
 		if (symbol != null) {
@@ -224,29 +225,29 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	}
 	
 	/**
-	 * creates an {@link OverpassFeatureLayer} from a given {@link LayerType}
+	 * creates an {@link OverpassFeatureLayer} from a given {@link Layer}
 	 *
-	 * @param layer the {@link LayerType}
+	 * @param layer the {@link Layer}
 	 * @return the created {@link OverpassFeatureLayer}
 	 *
 	 * @throws IOException              id the {@link OsmFile} couldn't load
 	 * @throws IllegalArgumentException if {@code layer} has an unknown type
 	 * @since 0.1.0
 	 */
-	public static OverpassFeatureLayer<?> createLayer(LayerType layer)
+	public static OverpassFeatureLayer<?> createLayer(Layer layer)
 	throws IOException, IllegalArgumentException {
 		String  script    = layer.getScript();
 		boolean useScript = script != null && !(script.isEmpty());
 		
-		FileType fileInfo = layer.getFile();
-		boolean  useFile  = !useScript && (fileInfo != null);
-		OsmFile  dataFile = null;
+		OsmFileDef fileInfo = layer.getFile();
+		boolean    useFile  = !useScript && (fileInfo != null);
+		OsmFile    dataFile = null;
 		if (useFile) {
 			dataFile = new OsmFile(fileInfo);
 		}
 		
-		if (layer instanceof NodeLayerType) {
-			NodeLayerType nodeLayer = (NodeLayerType) layer;
+		if (layer instanceof NodeLayer) {
+			NodeLayer nodeLayer = (NodeLayer) layer;
 			
 			log.debug("Create a layer of nodes from " + nodeLayer.getName());
 			
@@ -259,8 +260,8 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 			} else {
 				return new OverpassNodeLayer(nodeLayer.getId(), nodeLayer.getName(), nodeLayer.getDesc(), new HashSet<>(nodeLayer.getMetaFilter()), image);
 			}
-		} else if (layer instanceof LineLayerType) {
-			LineLayerType lineLayer = (LineLayerType) layer;
+		} else if (layer instanceof LineLayer) {
+			LineLayer lineLayer = (LineLayer) layer;
 			
 			log.debug("Create a layer of lines from " + lineLayer.getName());
 			
@@ -273,13 +274,13 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 			} else {
 				return new OverpassLineLayer(lineLayer.getId(), lineLayer.getName(), lineLayer.getDesc(), new HashSet<>(lineLayer.getMetaFilter()), symbol);
 			}
-		} else if (layer instanceof PolygonLayerType) {
-			PolygonLayerType polygonLayer = (PolygonLayerType) layer;
+		} else if (layer instanceof PolygonLayer) {
+			PolygonLayer polygonLayer = (PolygonLayer) layer;
 			
 			log.debug("Create a layer of polygons from " + polygonLayer.getName());
 			
 			SimpleFillSymbol sfs    = null;
-			FillSymbolType   symbol = polygonLayer.getSymbol();
+			FillSymbol       symbol = polygonLayer.getSymbol();
 			
 			if (symbol != null) {
 				sfs = new SimpleFillSymbol(SFSStyle.Solid, Color.decode(symbol.getColor()), OverpassFeatureLayer.parseSymbol(symbol.getOutline()));
