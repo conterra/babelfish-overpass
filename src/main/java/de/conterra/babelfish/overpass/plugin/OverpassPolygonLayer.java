@@ -79,13 +79,14 @@ public class OverpassPolygonLayer
 	 * @param file       the {@link OsmFile} to get the features from
 	 * @param typeKey    the {@link Tag} key to filter to
 	 * @param typeValues the {@link Tag} values to filter to
+	 * @param delimiter  delimiter RegEx to split the {@link Tag} value
 	 * @param symbol     the {@link SimpleFillSymbol} to render the {@link Way}s
 	 * @throws FileNotFoundException if {@code file} doesn't exist
 	 * @since 0.2.0
 	 */
-	public OverpassPolygonLayer(int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues, SimpleFillSymbol symbol)
+	public OverpassPolygonLayer(int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues, String delimiter, SimpleFillSymbol symbol)
 	throws FileNotFoundException {
-		super(Polygon.class, id, name, desc, file, typeKey, typeValues);
+		super(Polygon.class, id, name, desc, file, typeKey, typeValues, delimiter);
 		
 		this.renderer = OverpassPolygonLayer.createRenderer(name, symbol);
 	}

@@ -133,13 +133,14 @@ public abstract class OverpassFeatureLayer<G extends GeometryObject>
 	 * @param file         the {@link OsmFile} to get the features from
 	 * @param typeKey      the {@link Tag} key to filter to
 	 * @param typeValues   the {@link Tag} values to filter to
+	 * @param delimiter    delimiter RegEx to split the {@link Tag} value
 	 * @throws FileNotFoundException if {@code file} doesn't exist
 	 * @since 0.2.0
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues)
+	public OverpassFeatureLayer(Class<G> geometryType, int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues, String delimiter)
 	throws FileNotFoundException {
-		this(geometryType, id, name, desc, new FileFeatureStore(geometryType, file, typeKey, typeValues));
+		this(geometryType, id, name, desc, new FileFeatureStore(geometryType, file, typeKey, typeValues, delimiter));
 	}
 	
 	/**

@@ -8,6 +8,7 @@ import de.conterra.babelfish.plugin.v10_02.object.renderer.SimpleRenderer;
 import de.conterra.babelfish.plugin.v10_02.object.symbol.PictureMarkerSymbol;
 import de.conterra.babelfish.util.DataUtils;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
+import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -71,17 +72,20 @@ public class OverpassNodeLayer
 	/**
 	 * constructor, with given {@link OsmFile} and filter parameters
 	 *
-	 * @param id    the unique identifier
-	 * @param name  the user-friendly name
-	 * @param desc  the description
-	 * @param file  the {@link OsmFile} to get the features from
-	 * @param image the {@link Image} with which the points will be rendered
+	 * @param id         the unique identifier
+	 * @param name       the user-friendly name
+	 * @param desc       the description
+	 * @param file       the {@link OsmFile} to get the features from
+	 * @param typeKey    the {@link Tag} key to filter to
+	 * @param typeValues the {@link Tag} values to filter to
+	 * @param delimiter  delimiter RegEx to split the {@link Tag} value
+	 * @param image      the {@link Image} with which the points will be rendered
 	 * @throws FileNotFoundException if {@code file} doesn't exist
 	 * @since 0.2.0
 	 */
-	public OverpassNodeLayer(int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues, Image image)
+	public OverpassNodeLayer(int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues, String delimiter, Image image)
 	throws FileNotFoundException {
-		super(Point.class, id, name, desc, file, typeKey, typeValues);
+		super(Point.class, id, name, desc, file, typeKey, typeValues, delimiter);
 		
 		this.renderer = OverpassNodeLayer.createRenderer(name, image);
 	}

@@ -78,13 +78,14 @@ public class OverpassLineLayer
 	 * @param file       the {@link OsmFile} to get the features from
 	 * @param typeKey    the {@link Tag} key to filter to
 	 * @param typeValues the {@link Tag} values to filter to
+	 * @param delimiter  delimiter RegEx to split the {@link Tag} value
 	 * @param symbol     the {@link SimpleLineSymbol} to render the {@link Way}s
 	 * @throws FileNotFoundException if {@code file} doesn't exist
 	 * @since 0.2.0
 	 */
-	public OverpassLineLayer(int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues, SimpleLineSymbol symbol)
+	public OverpassLineLayer(int id, String name, String desc, OsmFile file, String typeKey, Set<String> typeValues, String delimiter, SimpleLineSymbol symbol)
 	throws FileNotFoundException {
-		super(Polyline.class, id, name, desc, file, typeKey, typeValues);
+		super(Polyline.class, id, name, desc, file, typeKey, typeValues, delimiter);
 		
 		this.renderer = OverpassLineLayer.createRenderer(name, symbol);
 	}

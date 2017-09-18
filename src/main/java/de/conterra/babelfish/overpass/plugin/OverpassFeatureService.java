@@ -91,14 +91,19 @@ public class OverpassFeatureService
 				}
 			}
 		} else {
-			OsmFile     file          = new OsmFile(fileType);
-			String      categoryTag   = service.getCategoryTag();
-			Set<String> typeValuesSet = new HashSet<>();
+			OsmFile file              = new OsmFile(fileType);
+			String  categoryTag       = service.getCategoryTag();
+			String  categoryDelimiter = service.getCategoryDelimiter();
 			
+			Set<String> typeValuesSet = new HashSet<>();
 			for (Entity entity : OverpassHandler.getFeatures(new OsmFile(fileType)).values()) {
 				for (Tag tag : entity.getTags()) {
 					if (tag.getKey().equals(categoryTag)) {
-						typeValuesSet.add(tag.getValue());
+						String tagValue = tag.getValue();
+						
+						typeValuesSet.add(tagValue);
+						typeValuesSet.addAll(Arrays.asList(tagValue.split(categoryDelimiter)));
+						
 						break;
 					}
 				}
@@ -146,7 +151,7 @@ public class OverpassFeatureService
 									symbol.setPath(OverpassFeatureService.replaceProperties(imgPath, properties));
 								}
 								
-								OverpassFeatureLayer.parseImage(symbol);
+								image = OverpassFeatureLayer.parseImage(symbol);
 							}
 							
 							featureLayer = new OverpassNodeLayer(
@@ -156,6 +161,7 @@ public class OverpassFeatureService
 									file,
 									categoryTag,
 									typeValueSet,
+									categoryDelimiter,
 									image
 							);
 						} else if (template instanceof LineLayerTemplate) {
@@ -167,6 +173,7 @@ public class OverpassFeatureService
 									file,
 									categoryTag,
 									typeValueSet,
+									categoryDelimiter,
 									OverpassFeatureLayer.parseSymbol(lineTemplate.getDefaultSymbol())
 							);
 						} else if (template instanceof PolygonLayerTemplate) {
@@ -178,6 +185,7 @@ public class OverpassFeatureService
 									file,
 									categoryTag,
 									typeValueSet,
+									categoryDelimiter,
 									OverpassFeatureLayer.parseSymbol(polygonTemplate.getDefaultSymbol())
 							);
 						} else {

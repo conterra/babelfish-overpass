@@ -47,6 +47,11 @@ public class FileFeatureStore<G extends GeometryObject>
 	 */
 	@Getter
 	private final Set<String> typeValues;
+	/**
+	 * delimiter RegEx to split the tag value
+	 */
+	@Getter
+	private final String      delimiter;
 	
 	/**
 	 * constructor, with given data {@link File}
@@ -55,16 +60,18 @@ public class FileFeatureStore<G extends GeometryObject>
 	 * @param file       the {@link OsmFile} to get the features from
 	 * @param typeKey    the {@link Tag} key to filter to
 	 * @param typeValues the {@link Tag} values to filter to
+	 * @param delimiter  delimiter RegEx to split the {@link Tag} value
 	 * @throws FileNotFoundException if {@code file} doesn't exist
 	 * @since 0.2.0
 	 */
-	public FileFeatureStore(Class<G> type, OsmFile file, String typeKey, Set<String> typeValues)
+	public FileFeatureStore(Class<G> type, OsmFile file, String typeKey, Set<String> typeValues, String delimiter)
 	throws FileNotFoundException {
 		super(type);
 		
 		this.file = file;
 		this.typeKey = typeKey;
 		this.typeValues = typeValues;
+		this.delimiter = delimiter;
 		
 		this.loadFromFile();
 	}
@@ -79,7 +86,7 @@ public class FileFeatureStore<G extends GeometryObject>
 	 */
 	public FileFeatureStore(Class<G> type, OsmFile file)
 	throws FileNotFoundException {
-		this(type, file, null, null);
+		this(type, file, null, null, null);
 	}
 	
 	@Override
@@ -109,9 +116,25 @@ public class FileFeatureStore<G extends GeometryObject>
 			
 			for (Entity entity : entities.values()) {
 				for (Tag tag : entity.getTags()) {
-					if (tag.getKey().equals(this.typeKey) && this.typeValues.contains(tag.getValue())) {
-						filteredEntities.put(entity.getId(), entity);
+					if (!(tag.getKey().equals(this.typeKey))) {
+						continue;
+					}
+					
+					String tagValue = tag.getValue();
+					long   id       = entity.getId();
+					
+					if (this.typeValues.contains(tagValue)) {
+						filteredEntities.put(id, entity);
 						break;
+					}
+					
+					if (this.delimiter != null) {
+						for (String value : tagValue.split(this.delimiter)) {
+							if (this.typeValues.contains(value)) {
+								filteredEntities.put(id, entity);
+								break;
+							}
+						}
 					}
 				}
 			}
