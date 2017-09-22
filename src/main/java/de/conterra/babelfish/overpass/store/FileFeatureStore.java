@@ -72,8 +72,6 @@ public class FileFeatureStore<G extends GeometryObject>
 		this.typeKey = typeKey;
 		this.typeValues = typeValues;
 		this.delimiter = delimiter;
-		
-		this.loadFromFile();
 	}
 	
 	/**

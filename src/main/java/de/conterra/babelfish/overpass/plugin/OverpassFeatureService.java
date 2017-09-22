@@ -96,7 +96,7 @@ public class OverpassFeatureService
 			String  categoryDelimiter = service.getCategoryDelimiter();
 			
 			Set<String> typeValuesSet = new HashSet<>();
-			for (Entity entity : OverpassHandler.getFeatures(new OsmFile(fileType)).values()) {
+			for (Entity entity : OverpassHandler.getFeatures(file).values()) {
 				for (Tag tag : entity.getTags()) {
 					if (tag.getKey().equals(categoryTag)) {
 						String tagValue = tag.getValue();
