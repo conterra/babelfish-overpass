@@ -42,6 +42,12 @@ public class OverpassPlugin
 	 */
 	public static final ObjectFactory  OBJECT_FACTORY  = new ObjectFactory();
 	/**
+	 * {@link FileFilter} to return only {@link File}s and filter directories
+	 *
+	 * @since 0.2.0
+	 */
+	public static final FileFilter     IS_FILE_FILTER  = pathname -> pathname.isFile();
+	/**
 	 * the services directory, where all configuration and data {@link File}s are stored
 	 *
 	 * @since 0.2.0
@@ -77,12 +83,7 @@ public class OverpassPlugin
 				JAXBContext  context      = JAXBContext.newInstance(Services.class);
 				Unmarshaller unmarshaller = context.createUnmarshaller();
 				
-				for (File file : OverpassPlugin.SERVICES_FOLDER.listFiles(new FileFilter() {
-					@Override
-					public boolean accept(File pathname) {
-						return pathname.isFile();
-					}
-				})) {
+				for (File file : OverpassPlugin.SERVICES_FOLDER.listFiles(OverpassPlugin.IS_FILE_FILTER)) {
 					try {
 						Services services = (Services) (unmarshaller.unmarshal(file));
 						
