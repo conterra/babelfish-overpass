@@ -9,14 +9,20 @@ import de.conterra.babelfish.plugin.v10_02.feature.wrapper.LayerWrapper;
 import de.conterra.babelfish.plugin.v10_02.object.feature.GeometryFeatureObject;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.GeometryObject;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.Point;
+import de.conterra.babelfish.plugin.v10_02.object.geometry.Polygon;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.Polyline;
+import de.conterra.babelfish.util.GeoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
+import org.geotools.geometry.iso.coordinate.PolygonImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
+import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.referencing.operation.TransformException;
 import org.openstreetmap.osmosis.core.domain.v0_6.*;
 
 import java.util.*;
@@ -137,7 +143,29 @@ public class FeatureConverter {
 		
 		LinkedHashMap<Long, OverpassFeature<GeometryFeatureObject<G>>> res = new LinkedHashMap<>();
 		
-		if (Polyline.class.isAssignableFrom(clazz)) {
+		if (Polygon.class.isAssignableFrom(clazz)) {
+			log.debug("Return all polygons.");
+			
+			for (long id : lines.keySet()) {
+				Polyline line = lines.get(id);
+				
+				try {
+					if (GeoUtils.isClosed(line)) {
+						PointArray controlPoints = line.getControlPoints();
+						
+						G polygon = (G) (new Polygon(new PolygonImpl(new SurfaceBoundaryImpl(
+								line.getCoordinateReferenceSystem(),
+								GeoUtils.createRing(controlPoints.toArray(new Position[controlPoints.size()])),
+								new ArrayList<>()
+						))));
+						
+						res.put(id, new OverpassFeature<>(EntityType.Way, id, new GeometryFeatureObject<>(polygon, metas.get(id))));
+					}
+				} catch (TransformException e) {
+					log.warn("Error on checking, if line is closed!", e);
+				}
+			}
+		} else if (Polyline.class.isAssignableFrom(clazz)) {
 			log.debug("Return all ways. (" + lines.size() + ")");
 			
 			for (long id : lines.keySet()) {
