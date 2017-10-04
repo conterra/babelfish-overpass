@@ -5,6 +5,7 @@ import de.conterra.babelfish.overpass.config.OverpassConfigStore;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.*;
 import de.conterra.babelfish.util.GeoUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -17,6 +18,7 @@ import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.domain.v0_6.*;
 import org.openstreetmap.osmosis.core.task.v0_6.RunnableSource;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
 
 import java.io.*;
@@ -25,8 +27,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.GZIPInputStream;
 
 /**
  * defines a class to handle the Overpass API connection
@@ -144,8 +148,10 @@ public class OverpassHandler {
 					log.debug("Overpass API returned HTTP status code " + statusCode + ".");
 					
 					if (statusCode == 400) {
-						String msg = "An error occured during the execution of the overpass query! This is what overpass API returned:\r\n";
-						msg += IOUtils.toString(httpConnection.getErrorStream());
+						String      msg         = "An error occured during the execution of the overpass query! This is what overpass API returned:\r\n";
+						InputStream errorStream = httpConnection.getErrorStream();
+						msg += IOUtils.toString(errorStream, de.conterra.babelfish.util.StringUtils.UTF8);
+						errorStream.close();
 						
 						log.error(msg);
 						throw new IOException(msg);
@@ -156,7 +162,6 @@ public class OverpassHandler {
 						
 						long stopTime = System.currentTimeMillis() + OverpassConfigStore.RETRY_DELAY;
 						while (System.currentTimeMillis() < stopTime) {
-							;
 						}
 						
 						continue;
@@ -302,7 +307,11 @@ public class OverpassHandler {
 	 */
 	public static Map<? extends Long, ? extends Entity> getFeatures(String script, Envelope bbox)
 	throws IllegalArgumentException, IOException {
-		return OverpassHandler.readFeatures(new OsmosisReader(OverpassHandler.request(script, bbox)));
+		InputStream                           inputStream = OverpassHandler.request(script, bbox);
+		Map<? extends Long, ? extends Entity> res         = OverpassHandler.readFeatures(new OsmosisReader(inputStream));
+		
+		inputStream.close();
+		return res;
 	}
 	
 	/**
@@ -311,31 +320,57 @@ public class OverpassHandler {
 	 * @param file the {@link OsmFile} to read from
 	 * @return a {@link Set} of all {@link Entity}s read from the data {@link File}
 	 *
-	 * @throws IllegalArgumentException if a inconsistent set of {@code dataFile}, {@code fileFormat} and {@code compression}
-	 * @throws FileNotFoundException    if the given {@link File} doesn't exist or is {@code null}
+	 * @throws IOException if the {@link File} couldn't read, the it doesn't exist or is {@code null}
 	 * @since 0.2.0
 	 */
 	public static Map<? extends Long, ? extends Entity> getFeatures(OsmFile file)
-	throws IllegalArgumentException, FileNotFoundException {
+	throws IOException {
 		File dataFile = file.getDataFile();
 		
 		if (dataFile == null || !(dataFile.exists())) {
 			throw new FileNotFoundException();
 		}
 		
-		RunnableSource reader;
+		Set<InputStream> streams = new HashSet<>();
+		RunnableSource   reader;
 		
+		CompressionMethod compression = file.getCompression();
 		switch (file.getFileFormat()) {
 			case XML:
-				reader = new XmlReader(file.getDataFile(), true, file.getCompression());
+				reader = new XmlReader(file.getDataFile(), true, compression);
 				break;
 			case PBF:
-				reader = new OsmosisReader(new FileInputStream(file.getDataFile()));
+				InputStream inputStream;
+				FileInputStream fileStream = new FileInputStream(file.getDataFile());
+				streams.add(fileStream);
+				
+				switch (compression) {
+					case GZip:
+						inputStream = new GZIPInputStream(fileStream);
+						break;
+					case BZip2:
+						inputStream = new BZip2CompressorInputStream(fileStream);
+						break;
+					case None:
+						inputStream = fileStream;
+						break;
+					default:
+						throw new IOException("Unsupported file compression: " + compression);
+				}
+				
+				streams.add(inputStream);
+				reader = new OsmosisReader(inputStream);
 				break;
 			default:
-				throw new IllegalArgumentException("Unknown file format!");
+				throw new IOException("Unknown file format!");
 		}
 		
-		return OverpassHandler.readFeatures(reader);
+		Map<? extends Long, ? extends Entity> res = OverpassHandler.readFeatures(reader);
+		
+		for (InputStream stream : streams) {
+			stream.close();
+		}
+		
+		return res;
 	}
 }

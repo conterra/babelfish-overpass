@@ -2,14 +2,16 @@ package de.conterra.babelfish.overpass.store;
 
 import de.conterra.babelfish.overpass.plugin.OverpassFeature;
 import de.conterra.babelfish.overpass.plugin.OverpassPopup;
+import de.conterra.babelfish.util.StringUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -30,31 +32,31 @@ public class PopupStore {
 	 *
 	 * @since 0.1.0
 	 */
-	private static final long expire_delay = 900000;
+	private static final long                     expire_delay    = 900000;
 	/**
 	 * the time to try again an Overpass API request
 	 *
 	 * @since 0.1.0
 	 */
-	private static final long try_again_delay = 15000;
+	private static final long                     try_again_delay = 15000;
 	/**
 	 * the {@link Timer}, which removes expired {@link OverpassPopup}s
 	 *
 	 * @since 0.1.0
 	 */
-	private static final Timer timer = new Timer();
+	private static final Timer                    timer           = new Timer();
 	/**
 	 * the stored {@link OverpassPopup}
 	 *
 	 * @since 0.1.0
 	 */
-	private static Map<Long, OverpassPopup> popups = new ConcurrentHashMap<>();
+	private static       Map<Long, OverpassPopup> popups          = new ConcurrentHashMap<>();
 	/**
 	 * the expire times of every stored {@link OverpassPopup}
 	 *
 	 * @since 0.1.0
 	 */
-	private static Map<Long, DateTime> expires = new ConcurrentHashMap<>();
+	private static       Map<Long, DateTime>      expires         = new ConcurrentHashMap<>();
 	
 	static {
 		PopupStore.start();
@@ -100,12 +102,14 @@ public class PopupStore {
 		if (!(PopupStore.expires.containsKey(id))) {
 			String content;
 			String entityTypeName = entityType.name().toLowerCase();
-			long delay;
+			long   delay;
 			
 			try {
 				String query = "[out:popup];" + entityTypeName + "(" + id + ");out;";
 				
-				content = IOUtils.toString((new URL("http://overpass-api.de/api/interpreter?data=" + URLEncoder.encode(query, "UTF-8"))).openStream());
+				InputStream inputStream = (new URL("http://overpass-api.de/api/interpreter?data=" + URLEncoder.encode(query, StringUtils.UTF8.toString()))).openStream();
+				content = IOUtils.toString(inputStream, StringUtils.UTF8);
+				inputStream.close();
 				delay = PopupStore.try_again_delay;
 			} catch (IOException e) {
 				content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n";

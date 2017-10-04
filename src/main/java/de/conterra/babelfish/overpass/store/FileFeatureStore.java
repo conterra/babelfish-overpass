@@ -100,11 +100,11 @@ public class FileFeatureStore<G extends GeometryObject>
 	/**
 	 * loads all features from {@code file}
 	 *
-	 * @throws FileNotFoundException if the {@link File} doesn't exist
+	 * @throws IOException if the {@link File} doesn't exist or couldn't read
 	 * @since 0.2.0
 	 */
 	private void loadFromFile()
-	throws FileNotFoundException {
+	throws IOException {
 		@SuppressWarnings("unchecked")
 		Class<G> geometryType = (Class<G>) OverpassHandler.geometryClassFromEntity(this.getEntityType());
 		

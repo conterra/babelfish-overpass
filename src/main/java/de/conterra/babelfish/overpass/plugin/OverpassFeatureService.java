@@ -16,7 +16,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 
 import java.awt.*;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -75,10 +75,11 @@ public class OverpassFeatureService
 	 * constructor, with given {@link Service}
 	 *
 	 * @param service the {@link Service}
+	 * @throws IOException if the {@link File} doesn't exist or couldn't read
 	 * @since 0.1.0
 	 */
 	public OverpassFeatureService(Service service)
-	throws FileNotFoundException {
+	throws IOException {
 		this(service.getId(), service.getDesc());
 		
 		OsmFileDef fileType = service.getFile();

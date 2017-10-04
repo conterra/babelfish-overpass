@@ -14,7 +14,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 /**
@@ -81,11 +81,17 @@ public class OverpassPlugin
 						Services services = (Services) (unmarshaller.unmarshal(file));
 						
 						for (Service xmlService : services.getService()) {
-							if (!(ServiceContainer.registerService(new OverpassFeatureService(xmlService)))) {
-								res = false;
+							try {
+								if (ServiceContainer.registerService(new OverpassFeatureService(xmlService))) {
+									continue;
+								}
+							} catch (IOException e) {
+								log.error("Couldn't load service, because of a wrong configuration!", e);
 							}
+							
+							res = false;
 						}
-					} catch (JAXBException | ClassCastException | FileNotFoundException e) {
+					} catch (JAXBException | ClassCastException e) {
 						String msg = "Could not load a valid Overpass configuration from: " + file.getName();
 						log.warn(msg, e);
 					}
