@@ -14,6 +14,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -76,7 +77,12 @@ public class OverpassPlugin
 				JAXBContext  context      = JAXBContext.newInstance(Services.class);
 				Unmarshaller unmarshaller = context.createUnmarshaller();
 				
-				for (File file : OverpassPlugin.SERVICES_FOLDER.listFiles()) {
+				for (File file : OverpassPlugin.SERVICES_FOLDER.listFiles(new FileFilter() {
+					@Override
+					public boolean accept(File pathname) {
+						return pathname.isFile();
+					}
+				})) {
 					try {
 						Services services = (Services) (unmarshaller.unmarshal(file));
 						

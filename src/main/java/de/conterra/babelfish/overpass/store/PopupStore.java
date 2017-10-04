@@ -2,6 +2,7 @@ package de.conterra.babelfish.overpass.store;
 
 import de.conterra.babelfish.overpass.plugin.OverpassFeature;
 import de.conterra.babelfish.overpass.plugin.OverpassPopup;
+import de.conterra.babelfish.util.DataUtils;
 import de.conterra.babelfish.util.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -109,7 +110,7 @@ public class PopupStore {
 				
 				InputStream inputStream = (new URL("http://overpass-api.de/api/interpreter?data=" + URLEncoder.encode(query, StringUtils.UTF8.toString()))).openStream();
 				content = IOUtils.toString(inputStream, StringUtils.UTF8);
-				inputStream.close();
+				DataUtils.closeStream(inputStream);
 				delay = PopupStore.try_again_delay;
 			} catch (IOException e) {
 				content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n";

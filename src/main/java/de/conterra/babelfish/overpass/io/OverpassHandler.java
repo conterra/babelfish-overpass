@@ -3,6 +3,7 @@ package de.conterra.babelfish.overpass.io;
 import crosby.binary.osmosis.OsmosisReader;
 import de.conterra.babelfish.overpass.config.OverpassConfigStore;
 import de.conterra.babelfish.plugin.v10_02.object.geometry.*;
+import de.conterra.babelfish.util.DataUtils;
 import de.conterra.babelfish.util.GeoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
@@ -151,7 +152,7 @@ public class OverpassHandler {
 						String      msg         = "An error occured during the execution of the overpass query! This is what overpass API returned:\r\n";
 						InputStream errorStream = httpConnection.getErrorStream();
 						msg += IOUtils.toString(errorStream, de.conterra.babelfish.util.StringUtils.UTF8);
-						errorStream.close();
+						DataUtils.closeStream(errorStream);
 						
 						log.error(msg);
 						throw new IOException(msg);
@@ -310,7 +311,7 @@ public class OverpassHandler {
 		InputStream                           inputStream = OverpassHandler.request(script, bbox);
 		Map<? extends Long, ? extends Entity> res         = OverpassHandler.readFeatures(new OsmosisReader(inputStream));
 		
-		inputStream.close();
+		DataUtils.closeStream(inputStream);
 		return res;
 	}
 	
@@ -368,7 +369,7 @@ public class OverpassHandler {
 		Map<? extends Long, ? extends Entity> res = OverpassHandler.readFeatures(reader);
 		
 		for (InputStream stream : streams) {
-			stream.close();
+			DataUtils.closeStream(stream);
 		}
 		
 		return res;
